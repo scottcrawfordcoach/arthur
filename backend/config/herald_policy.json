@@ -1,0 +1,149 @@
+{
+  "description": "Herald external search policy - governs web search, privacy, and resource limits",
+  "version": "1.0.0",
+  "budgets": {
+    "description": "Rate limits and cost controls",
+    "daily_search_limit": 100,
+    "monthly_search_limit": 3000,
+    "cost_per_search_usd": 0.001,
+    "monthly_budget_usd": 10.0,
+    "reset_hour_utc": 0
+  },
+  "search_behavior": {
+    "description": "Default search parameters",
+    "default_max_results": 5,
+    "default_search_depth": "basic",
+    "search_depth_options": ["basic", "advanced"],
+    "timeout_seconds": 15,
+    "retry_attempts": 2,
+    "retry_delay_ms": 1000
+  },
+  "privacy": {
+    "description": "PII protection and query sanitization",
+    "sanitize_queries": true,
+    "sanitization_model": "gpt-4o-mini",
+    "log_searches": true,
+    "log_retention_days": 90,
+    "pii_categories": [
+      "names",
+      "addresses",
+      "phone_numbers",
+      "email_addresses",
+      "social_security_numbers",
+      "dates_of_birth",
+      "ages",
+      "medical_information"
+    ]
+  },
+  "content_filtering": {
+    "description": "Blocked keywords and domain controls",
+    "enabled": true,
+    "blocked_keywords": [
+      "illegal",
+      "harmful",
+      "explicit",
+      "violence",
+      "hate",
+      "terrorism"
+    ],
+    "blocked_domains": [
+      "malware-site.com",
+      "spam-site.com",
+      "phishing-site.com"
+    ],
+    "allowed_domains": [],
+    "allowlist_mode": false,
+    "description_allowlist": "If allowlist_mode=true, ONLY allowed_domains are searched"
+  },
+  "trust_scoring": {
+    "description": "Domain reputation and trust calculation",
+    "enabled": true,
+    "base_trust_score": 0.5,
+    "trusted_domain_boost": 0.3,
+    "high_search_score_boost": 0.2,
+    "high_search_score_threshold": 0.8,
+    "trusted_domains": [
+      "wikipedia.org",
+      "github.com",
+      "stackoverflow.com",
+      "mozilla.org",
+      ".edu",
+      ".gov",
+      "arxiv.org",
+      "scholar.google.com"
+    ],
+    "trust_score_minimum": 0.0,
+    "trust_score_maximum": 1.0
+  },
+  "result_processing": {
+    "description": "How search results are processed and filtered",
+    "max_characters_per_result": 2000,
+    "summarize_results": true,
+    "summarization_model": "gpt-4o-mini",
+    "max_summarization_tokens": 500,
+    "remove_duplicates": true,
+    "similarity_threshold": 0.85
+  },
+  "provenance": {
+    "description": "Result metadata and source tracking",
+    "tag_all_results": true,
+    "track_source_engine": true,
+    "track_query_intent": true,
+    "track_trust_score": true,
+    "track_retrieval_timestamp": true,
+    "include_in_response": true
+  },
+  "categories": {
+    "description": "Allowed search categories (future feature)",
+    "allowed_categories": [
+      "general",
+      "tech",
+      "health",
+      "science",
+      "education",
+      "news",
+      "reference"
+    ],
+    "blocked_categories": [
+      "adult",
+      "gambling",
+      "illegal"
+    ]
+  },
+  "tavily_integration": {
+    "description": "Tavily API-specific settings",
+    "api_key_env": "TAVILY_API_KEY",
+    "base_url": "https://api.tavily.com/search",
+    "default_search_depth": "basic",
+    "include_answer": true,
+    "include_raw_content": false,
+    "include_images": false,
+    "max_api_retries": 3
+  },
+  "fallback_behavior": {
+    "description": "What to do when Herald fails",
+    "graceful_degradation": true,
+    "return_empty_on_failure": true,
+    "log_failures": true,
+    "notify_user_on_failure": false,
+    "fallback_message": "External search unavailable - using internal knowledge only"
+  },
+  "audit": {
+    "description": "Audit trail and compliance logging",
+    "log_all_searches": true,
+    "log_blocked_searches": true,
+    "log_sanitization": true,
+    "log_policy_violations": true,
+    "audit_retention_days": 365,
+    "include_user_id": false,
+    "include_original_query": true,
+    "include_sanitized_query": true
+  },
+  "tuning_notes": {
+    "daily_limit": "Increase to allow more searches per day (affects cost)",
+    "sanitization": "Disable at your own risk - PII may leak to external APIs",
+    "blocked_keywords": "Add terms to prevent searches for inappropriate content",
+    "trusted_domains": "Add domains you trust to boost their results in trust scoring",
+    "result_limit": "Increase max_results for more comprehensive searches (slower, more expensive)"
+  }
+}

@@ -1,0 +1,334 @@
+{
+  "description": "Formalized schema for all Evidence Council signals",
+  "version": "1.0.0",
+  "signals": {
+    "emotion": {
+      "description": "Emotional state signals from Emotion Knight",
+      "source": "Emotion Knight (Phase 1)",
+      "fields": {
+        "urgency": {
+          "type": "number",
+          "range": [0, 1],
+          "description": "How urgent/distressed the user is",
+          "examples": {
+            "low": 0.2,
+            "moderate": 0.5,
+            "high": 0.8,
+            "crisis": 0.95
+          }
+        },
+        "sentiment": {
+          "type": "string",
+          "enum": ["positive", "neutral", "negative", "mixed"],
+          "description": "Overall emotional tone"
+        },
+        "risk_level": {
+          "type": "string",
+          "enum": ["low", "moderate", "high"],
+          "description": "Assessed risk (self-harm, crisis, etc.)"
+        },
+        "concerns": {
+          "type": "array",
+          "items": "string",
+          "description": "List of specific concerns detected",
+          "examples": ["anxiety", "overwhelm", "burnout", "crisis language"]
+        }
+      }
+    },
+    "needs": {
+      "description": "User needs and intent signals from Needs Knight",
+      "source": "Needs Knight (Phase 1)",
+      "fields": {
+        "stated_intent": {
+          "type": "string",
+          "enum": [
+            "information",
+            "learning",
+            "emotional_support",
+            "motivation",
+            "problem_solving",
+            "decision_making",
+            "general"
+          ],
+          "description": "Primary intent of the user's message"
+        },
+        "learning_intent": {
+          "type": "number",
+          "range": [0, 1],
+          "description": "How much the user wants to learn/understand",
+          "examples": {
+            "low": 0.2,
+            "moderate": 0.5,
+            "high": 0.9
+          }
+        },
+        "support_needed": {
+          "type": "array",
+          "items": "string",
+          "description": "Types of support requested",
+          "examples": [
+            "emotional validation",
+            "coping strategies",
+            "practical advice",
+            "motivation"
+          ]
+        },
+        "information_gaps": {
+          "type": "array",
+          "items": "string",
+          "description": "What information the user is missing",
+          "examples": [
+            "how to start",
+            "technical details",
+            "best practices"
+          ]
+        }
+      }
+    },
+    "pattern": {
+      "description": "Behavioral patterns from Pattern Knight",
+      "source": "Pattern Knight (Phase 1)",
+      "fields": {
+        "engagement_level": {
+          "type": "string",
+          "enum": [
+            "normal",
+            "exploratory",
+            "learning",
+            "analytical",
+            "emotional"
+          ],
+          "description": "Current engagement mode"
+        },
+        "behavior_type": {
+          "type": "string",
+          "enum": [
+            "conversation",
+            "wellness_tracking",
+            "goal_setting",
+            "journaling",
+            "problem_solving"
+          ],
+          "description": "Type of behavior pattern detected"
+        },
+        "exploratory": {
+          "type": "number",
+          "range": [0, 1],
+          "description": "How exploratory/curious the user is",
+          "examples": {
+            "low": 0.2,
+            "moderate": 0.5,
+            "high": 0.8
+          }
+        },
+        "goal_alignment": {
+          "type": "number",
+          "range": [0, 1],
+          "description": "How aligned this is with user's goals",
+          "examples": {
+            "low": 0.2,
+            "moderate": 0.5,
+            "high": 0.8
+          }
+        },
+        "recurring_topics": {
+          "type": "array",
+          "items": "string",
+          "description": "Topics the user frequently discusses",
+          "examples": [
+            "marathon training",
+            "career development",
+            "meditation"
+          ]
+        }
+      }
+    },
+    "context": {
+      "description": "Retrieved context from Context Knight + Librarian",
+      "source": "Context Knight (Phase 2) + Librarian",
+      "fields": {
+        "internal_context_summary": {
+          "type": "string",
+          "description": "Summary of all retrieved internal context"
+        },
+        "context_requests_fulfilled": {
+          "type": "array",
+          "items": "object",
+          "description": "List of context requests and their results"
+        },
+        "context_gaps": {
+          "type": "array",
+          "items": "string",
+          "description": "Context that was needed but not found",
+          "examples": [
+            "No prior wellness data",
+            "No goals set",
+            "No relevant journal entries"
+          ]
+        },
+        "relevance_scores": {
+          "type": "object",
+          "description": "3D relevance scores for retrieved context",
+          "fields": {
+            "avg_semantic": "number",
+            "avg_recency": "number",
+            "avg_frequency": "number",
+            "avg_vehemence": "number"
+          }
+        }
+      }
+    },
+    "analysis": {
+      "description": "Synthesis and recommendations from Analysis Knight",
+      "source": "Analysis Knight (Phase 3)",
+      "fields": {
+        "synthesis_strategy": {
+          "type": "string",
+          "description": "Recommended strategy for final synthesis"
+        },
+        "herald_recommendation": {
+          "type": "object",
+          "description": "Whether to invoke Herald and why",
+          "fields": {
+            "invoke": {
+              "type": "boolean",
+              "description": "Should Herald be invoked?"
+            },
+            "reason": {
+              "type": "string",
+              "description": "Why Herald should/shouldn't be invoked"
+            },
+            "search_query": {
+              "type": "string",
+              "description": "Optimized query for Herald (if invoke=true)"
+            },
+            "priority": {
+              "type": "string",
+              "enum": ["low", "medium", "high"],
+              "description": "Search priority level"
+            }
+          }
+        },
+        "complexity": {
+          "type": "string",
+          "enum": ["simple", "moderate", "complex"],
+          "description": "Query complexity assessment"
+        },
+        "confidence": {
+          "type": "number",
+          "range": [0, 1],
+          "description": "Confidence in analysis"
+        }
+      }
+    }
+  },
+  "metadata": {
+    "description": "Additional metadata about the signal extraction",
+    "fields": {
+      "confidence": {
+        "type": "number",
+        "range": [0, 1],
+        "description": "Overall confidence across all Knights"
+      },
+      "degraded": {
+        "type": "boolean",
+        "description": "Whether any Knight failed gracefully"
+      },
+      "knight_status": {
+        "type": "object",
+        "description": "Success/degraded status for each Knight",
+        "fields": {
+          "emotion": "string",
+          "needs": "string",
+          "pattern": "string",
+          "context": "string",
+          "analysis": "string"
+        }
+      },
+      "execution_time": {
+        "type": "number",
+        "description": "Total execution time in milliseconds"
+      },
+      "phase_times": {
+        "type": "object",
+        "description": "Execution time per phase",
+        "fields": {
+          "phase1": "number",
+          "phase2": "number",
+          "phase3": "number"
+        }
+      }
+    }
+  },
+  "validation_rules": {
+    "description": "Rules for validating signal integrity",
+    "required_fields": {
+      "emotion": ["urgency", "sentiment"],
+      "needs": ["stated_intent"],
+      "pattern": ["engagement_level"],
+      "context": ["internal_context_summary"],
+      "analysis": ["herald_recommendation"]
+    },
+    "range_checks": {
+      "urgency": [0, 1],
+      "learning_intent": [0, 1],
+      "exploratory": [0, 1],
+      "goal_alignment": [0, 1],
+      "confidence": [0, 1]
+    },
+    "defaults": {
+      "urgency": 0.5,
+      "sentiment": "neutral",
+      "risk_level": "low",
+      "stated_intent": "general",
+      "learning_intent": 0.5,
+      "engagement_level": "normal",
+      "exploratory": 0.5,
+      "goal_alignment": 0.5
+    }
+  },
+  "examples": {
+    "crisis_scenario": {
+      "emotion": {
+        "urgency": 0.92,
+        "sentiment": "negative",
+        "risk_level": "high",
+        "concerns": ["crisis language", "overwhelm", "despair"]
+      },
+      "needs": {
+        "stated_intent": "emotional_support",
+        "learning_intent": 0.1,
+        "support_needed": ["immediate validation", "safety check"],
+        "information_gaps": []
+      },
+      "pattern": {
+        "engagement_level": "emotional",
+        "behavior_type": "conversation",
+        "exploratory": 0.2,
+        "goal_alignment": 0.3,
+        "recurring_topics": []
+      }
+    },
+    "learning_scenario": {
+      "emotion": {
+        "urgency": 0.2,
+        "sentiment": "positive",
+        "risk_level": "low",
+        "concerns": []
+      },
+      "needs": {
+        "stated_intent": "learning",
+        "learning_intent": 0.92,
+        "support_needed": [],
+        "information_gaps": ["technical details", "best practices"]
+      },
+      "pattern": {
+        "engagement_level": "learning",
+        "behavior_type": "conversation",
+        "exploratory": 0.8,
+        "goal_alignment": 0.6,
+        "recurring_topics": ["React", "JavaScript"]
+      }
+    }
+  }
+}

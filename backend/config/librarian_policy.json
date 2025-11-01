@@ -1,0 +1,132 @@
+{
+  "description": "Librarian data access and retention policy - governs 3D scoring, memory aging, and privacy",
+  "version": "1.0.0",
+  "retention": {
+    "description": "Automatic memory management based on age",
+    "compression": {
+      "enabled": true,
+      "threshold_days": 90,
+      "compression_ratio": 0.2,
+      "compress_to_tokens": 200,
+      "description": "Conversations older than 90 days are compressed to summaries"
+    },
+    "archiving": {
+      "enabled": true,
+      "threshold_days": 365,
+      "description": "Data older than 365 days moved to archive tier"
+    },
+    "deletion": {
+      "enabled": false,
+      "threshold_days": 730,
+      "description": "Data older than 730 days permanently deleted (disabled by default)"
+    }
+  },
+  "3d_scoring": {
+    "description": "Multi-dimensional relevance scoring weights",
+    "weights": {
+      "semantic": 0.40,
+      "recency": 0.25,
+      "frequency": 0.20,
+      "vehemence": 0.15
+    },
+    "semantic": {
+      "description": "Cosine similarity between query and content embeddings",
+      "minimum_similarity": 0.3,
+      "high_relevance_threshold": 0.75
+    },
+    "recency": {
+      "description": "Exponential decay based on age: e^(-age/decay_days)",
+      "decay_days": 30,
+      "examples": {
+        "2_days_old": 0.936,
+        "30_days_old": 0.368,
+        "100_days_old": 0.036
+      }
+    },
+    "frequency": {
+      "description": "Log-scaled access frequency: log(count+1)/log(100)",
+      "max_references": 100,
+      "examples": {
+        "1_reference": 0.151,
+        "10_references": 0.521,
+        "50_references": 0.854
+      }
+    },
+    "vehemence": {
+      "description": "Emotional intensity from metadata (urgency + sentiment + risk)",
+      "sub_weights": {
+        "urgency": 0.5,
+        "sentiment": 0.3,
+        "risk": 0.2
+      },
+      "examples": {
+        "low_intensity": 0.150,
+        "medium_intensity": 0.500,
+        "high_intensity": 0.830
+      }
+    }
+  },
+  "access_limits": {
+    "description": "Query result limits to prevent overload",
+    "max_results_per_query": 50,
+    "max_history_messages": 100,
+    "max_context_tokens": 8000,
+    "max_chunks_per_file": 1000
+  },
+  "tier_priorities": {
+    "description": "Knowledge tier search order",
+    "default_order": [
+      "core_knowledge",
+      "personal_journal",
+      "reference_library",
+      "archive"
+    ],
+    "tier_definitions": {
+      "core_knowledge": "High-priority, frequently accessed information",
+      "personal_journal": "User's personal notes, reflections, and experiences",
+      "reference_library": "External documents, books, articles",
+      "archive": "Older, less frequently accessed data"
+    }
+  },
+  "privacy": {
+    "description": "Data privacy and deletion policies",
+    "pii_redaction": {
+      "enabled": false,
+      "description": "Redact PII from stored content (disabled - user owns local data)"
+    },
+    "user_data_deletion": {
+      "enabled": true,
+      "audit_logging": true,
+      "backup_before_delete": true,
+      "backup_retention_days": 30
+    },
+    "export_redaction": {
+      "enabled": false,
+      "description": "Redact PII when exporting data (future feature)"
+    }
+  },
+  "dynamic_tables": {
+    "description": "Allow Librarian to create/delete tables based on user requests",
+    "enabled": true,
+    "require_confirmation": false,
+    "backup_on_delete": true,
+    "allowed_prefixes": ["user_", "custom_", "temp_"]
+  },
+  "performance": {
+    "description": "Performance optimization settings",
+    "cache_embeddings": true,
+    "cache_ttl_seconds": 3600,
+    "parallel_searches": true,
+    "max_parallel_queries": 5,
+    "index_optimization": {
+      "rebuild_threshold_records": 10000,
+      "vacuum_on_delete": true
+    }
+  },
+  "tuning_notes": {
+    "3d_weights": "Adjust semantic/recency/frequency/vehemence to change what 'relevant' means",
+    "recency_decay": "Lower decay_days = more emphasis on recent data (30 is balanced)",
+    "compression": "Lower threshold_days = more aggressive compression (saves space, loses detail)",
+    "retention": "Enable deletion with caution - data is permanently lost after threshold"
+  }
+}

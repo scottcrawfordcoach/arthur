@@ -1,0 +1,57 @@
+{
+  "name": "scottbot-local",
+  "version": "1.0.0",
+  "description": "Local-first AI assistant with file conversion, semantic recall, and chat interface",
+  "type": "module",
+  "scripts": {
+    "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "server": "nodemon backend/server.js",
+    "client": "cd frontend && npm run dev",
+    "build": "cd frontend && npm run build",
+    "db:init": "node backend/scripts/initDb.js",
+    "db:migrate": "node backend/scripts/migrate.js",
+    "converter": "python converter/main.py",
+    "setup": "npm install && cd frontend && npm install && cd .. && npm run db:init",
+    "test": "node test-assistant.js",
+    "test:ai": "node test-ai-responses.js",
+    "test:council": "node backend/scripts/test-evidence-council.js",
+    "test:librarian": "node backend/scripts/test-librarian.js",
+    "test:herald": "node backend/scripts/test-herald.js",
+    "test:arthur": "node backend/scripts/test-arthur.js",
+    "test:data:generate": "node backend/scripts/generate-synthetic-history.js",
+  "test:data:seed-fragments": "node backend/scripts/seed-scattered-fragments.js",
+  "test:data:seed-topic-cloud": "node backend/scripts/seed-topic-cloud-demo.js",
+    "test:data:stats": "node backend/scripts/manage-test-data.js stats",
+    "test:data:sample": "node backend/scripts/manage-test-data.js sample",
+    "test:data:clean": "node backend/scripts/manage-test-data.js delete"
+  },
+  "keywords": [
+    "ai",
+    "assistant",
+    "chat",
+    "file-conversion",
+    "embeddings"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "better-sqlite3": "^9.2.2",
+    "cors": "^2.8.5",
+    "date-fns": "^3.0.6",
+    "dotenv": "^16.3.1",
+    "drizzle-orm": "^0.29.3",
+    "express": "^4.18.2",
+    "form-data": "^4.0.4",
+    "mime-types": "^2.1.35",
+    "multer": "^1.4.5-lts.1",
+    "node-fetch": "^3.3.2",
+    "openai": "^4.24.1",
+    "uuid": "^9.0.1",
+    "winston": "^3.11.0"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2",
+    "drizzle-kit": "^0.20.9",
+    "nodemon": "^3.0.2"
+  }
+}

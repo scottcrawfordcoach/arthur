@@ -1,0 +1,59 @@
+{
+  "policy_name": "ScottBot V5 Master Merge Policy",
+  "description": "Defines how the Coaching/Master Agent assembles outputs from Receptionist + Sub-Agents into the final user-facing response.",
+  "merge_order": [
+    "acknowledgements",
+    "analysis",
+    "reflection_prompts"
+  ],
+  "rules": {
+    "acknowledgements": {
+      "combine": "merge_unique",
+      "priority": "shortest_first",
+      "notes": "Merge sub-agent acknowledgements into one concise acknowledgement of user input."
+    },
+    "analysis": {
+      "combine": "summarize_and_merge",
+      "priority": "goal_agent_if_present",
+      "notes": "Merge sub-agent analysis summaries into a coherent narrative. Prioritize Goal Agent when present. Deduplicate overlaps."
+    },
+    "reflection_prompts": {
+      "combine": "select_best",
+      "priority": "goal_agent_then_coaching",
+      "notes": "Select or merge a single reflection prompt. Prefer Goal Agent prompts if linked to active goals; otherwise Coaching Agent prompt."
+    },
+    "db_actions": {
+      "combine": "aggregate",
+      "priority": "none",
+      "notes": "Collect all sub-agent DB actions into a single queue for Data Handling Agent."
+    },
+    "insights": {
+      "combine": "append",
+      "priority": "none",
+      "notes": "Append insights from sub-agents; Master decides whether to surface them in final response based on user preferences."
+    }
+  },
+  "user_prefs": {
+    "modes": ["reflective", "data_driven", "light_touch"],
+    "rules": {
+      "reflective": {
+        "include_ack": true,
+        "include_analysis": true,
+        "include_reflection_prompt": true,
+        "include_insights": true
+      },
+      "data_driven": {
+        "include_ack": true,
+        "include_analysis": true,
+        "include_reflection_prompt": false,
+        "include_insights": true
+      },
+      "light_touch": {
+        "include_ack": true,
+        "include_analysis": false,
+        "include_reflection_prompt": true,
+        "include_insights": false
+      }
+    }
+  }
+}

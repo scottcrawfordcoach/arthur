@@ -1,0 +1,60 @@
+---
+title: "Gandhi’s 10 Fundamentals for Changing the World"
+author: "HENRIK EDBERG"
+category: "Personal"
+source_type: "personal-development"
+input_format: "pdf"
+
+# 📚 Provenance & Licensing
+copyright: ""
+license_type: "All Rights Reserved"
+restricted: true
+redistribution_policy: "inspiration_only"
+citation_required: true
+privacy_level: "restricted"
+source_url: ""
+
+# 🧠 Usage Context
+summary: "The document discusses Mahatma Gandhi's 10 principles for changing the world, focusing on personal transformation, self-control, forgiveness, and positive actions."
+tags: ["personal-development", "inspiration", "self-improvement"]
+embedding_status: "summary_only"
+use_in_generation: true
+allow_verbatim_export: false
+
+# 🧾 Tracking
+ingested_at: "2025-10-09"
+last_modified: "2025-10-09"
+date_original: "unknown"
+original_path: ""
+source_quality: "verified"
+word_count: 1946
+reading_time: 10
+key_topics: ["personal transformation", "self-control", "forgiveness", "positive actions"]
+archived: true
+version: 1.0
+---
+
+Gandhi’s 10 Fundamentals for Changing the World
+by HENRIK EDBERG
+“You must not lose faith in humanity. Humanity is an ocean; if a
+few drops of the ocean are dirty, the ocean does not become dirty.”
+Mahatma Gandhi needs no long introduction. Everyone knows about the man who lead
+the Indian people to independence from British rule in 1947.
+So let’s just move on to some of my favourite tips from Mahatma Gandhi.
+1. Change yourself.
+“You must be the change you want to see in the world.”“As human beings, our greatness lies not so much in being able to remake the world –that is the myth of the atomic age – as in being able to remake ourselves.”
+If you change yourself you will change your world. If you change how you think then
+you will change how you feel and what actions you take. And so the world around you will change. Not only because you are now viewing your environment through new lenses of thoughts and emotions but also because the change within can allow you to take action in ways you wouldn’t have – or maybe even have thought about – while stuck in your old thought patterns.
+And the problem with changing your outer world without changing yourself is that  you
+will still be you  when you reach that change you have strived for. You will still have
+your flaws, anger, negativity, self-sabotaging tendencies etc. intact.  And so in this
+new situation you will still not find what you hoped for since your mind is still seeping
+with that negative stuff. And if you get more without having some insight into and distance from your ego it may grow more powerful. Since your ego loves to divide things, to find enemies and to create separation it may start to try to create even more problems and conflicts in your life and world.
+2. You are in control.“Nobody can hurt me without my permission.”
+What you feel and how you react to something is always up to you. There may be a
+“normal” or a common way to react to different things. But that’s mostly just all it is.
+
+You can choose your own thoughts, reactions and emotions to pretty much everything. You don’t have to freak out, overreact of even react in a negative way. Perhaps not every time or instantly. Sometimes a knee-jerk reaction just goes off. Or an old thought habit kicks in. And as you realize that no-one outside of yourself can actually control how you feel you can start to incorporate this thinking into your daily life and develop it as a thought habit. A habit that you can grow stronger and stronger over time. Doing this makes life a whole lot easier and more pleasurable. 3. Forgive and let it go. “The weak can never forgive. Forgiveness is the attribute of the strong.” “An eye for eye only ends up making the whole world blind.” Fighting evil with evil won’t help anyone. And as said in the previous tip, you always choose how to react to something. When you can incorporate such a thought habit more and more into your life then you can react in a way that is more useful to you and others. You realize that forgiving and letting go of the past will do you and the people in your world a great service. And spending your time in some negative memory won’t help you after you have learned the lessons you can learn from that experience. You’ll probably just cause yourself more suffering and paralyze yourself from taking action in this present moment. If you don’t forgive then you let the past and another person to control how you feel. By forgiving you release yourself from those bonds. And then you can focus totally on, for instance, the next point. 4. Without action you aren’t going anywhere. “An ounce of practice is worth more than tons of preaching.” Without taking action very little will be done. However, taking action can be hard and difficult. There can be much inner resistance. And so you may resort to preaching, as Gandhi says. Or reading and studying endlessly. And feeling like you are moving forward. But getting little or no practical results in real life. So, to really get where you want to go and to really understand yourself and your world you need to practice. Books can mostly just bring you knowledge. You have to take action and translate that knowledge into results and understanding. 5. Take care of this moment. “I do not want to foresee the future. I am concerned with taking care of the present. God has given me no control over the moment following.” The best way that I have found to overcome the inner resistance that often stops us from taking action is to stay in the present as much as possible and to be accepting.   2
+Why? Well, when you are in the present moment you don’t worry about the next moment that you can’t control anyway. And the resistance to action that comes from you imagining negative future consequences – or reflecting on past failures – of your actions loses its power. And so it becomes easier to both take action and to keep your focus on this moment and perform better. And remember that reconnecting with and staying in the now is a mental habit – a sort of muscle – that you grow. Over time it becomes more powerful and makes it easier to slip into the present moment. 6. Everyone is human. “I claim to be a simple individual liable to err like any other fellow mortal. I own, however, that I have humility enough to confess my errors and to retrace my steps.” “It is unwise to be too sure of one’s own wisdom. It is healthy to be reminded that the strongest might weaken and the wisest might err.” When you start to make myths out of people – even though they may have produced extraordinary results – you run the risk of becoming disconnected from them. You can start to feel like you could never achieve similar things that they did because they are so very different. So it’s important to keep in mind that everyone is just a human being no matter who they are. And I think it’s important to remember that we are all human and prone to make mistakes. Holding people to unreasonable standards will only create more unnecessary conflicts in your world and negativity within you. It’s also important to remember this to avoid falling into the pretty useless habit of beating yourself up over mistakes that you have made. And instead be able to see with clarity where you went wrong and what you can learn from your mistake. And then try again. 7. Persist. “First they ignore you, then they laugh at you, then they fight you, then you win.” Be persistent. In time the opposition around you will fade and fall away. And your inner resistance and self-sabotaging tendencies that want to hold you back and keep you like you have always been will grow weaker. Find what you really like to do. Then you’ll find the inner motivation to keep going, going and going. One reason Gandhi was so successful with his method of non-violence was because he and his followers were so persistent. They just didn’t give up. Success or victory will seldom come as quickly as you would have liked it to. I think one of the reasons people don’t get what they want is simply because they give up too soon. The time they think an achievement will require isn’t the same amount of time it usually takes to achieve that goal. This faulty belief partly comes from the world we live in. A world full of magic pill solutions where advertising continually promises us that we can lose a lot of weight or earn a ton of money in just 30 days. Finally, one useful tip to keep your persistence going is to listen to Gandhi’s third quote in this article and keep a sense of humor. It can lighten things up at the toughest of times.   3
+8. See the good in people and help them. “I look only to the good qualities of men. Not being faultless myself, I won’t presume to probe into the faults of others.” “Man becomes great exactly in the degree in which he works for the welfare of his fellow-men.” “I suppose leadership at one time meant muscles; but today it means getting along with people.” There is pretty much always something good in people. And things that may not be so good. But you can choose what things to focus on. And if you want improvement then focusing on the good in people is a useful choice. It also makes life easier for you as your world and relationships become more pleasant and positive. And when you see the good in people it becomes easier to motivate yourself to be of service to them. By being of service to other people, by giving them value you not only make their lives better. Over time you tend to get what you give. And the people you help may feel more inclined to help other people. And so you, together, create an upward spiral of positive change that grows and becomes stronger. By strengthening your social skills you can become a more influential person and make this upward spiral even stronger.  9. Be congruent, be authentic, be your true self. “Happiness is when what you think, what you say, and what you do are in harmony.” “Always aim at complete harmony of thought and word and deed. Always aim at purifying your thoughts and everything will be well.” I think that one of the best tips for improving your social skills is to behave in a congruent manner and communicate in an authentic way. People seem to really like authentic communication. And there is much inner enjoyment to be found when your thoughts, words and actions are aligned. You feel powerful and good about yourself. When words and thoughts are aligned then that shows through in your communication. Because now you have your voice tonality and body language – some say they are over 90 percent of communication – in alignment with your words. With these channels in alignment people tend to really listen to what you’re saying. You are communicating without incongruency, mixed messages or perhaps a sort of phoniness. Also, if your actions aren’t in alignment with what you’re communicating then you start to hurt your own belief in what you can do. And other people’s belief in you too. 10. Continue to grow and evolve. ”Constant development is the law of life, and a man who always tries to maintain his dogmas in order to appear consistent drives himself into a false position.”   4
+You can pretty much always improve your skills, habits or re-evaluate your evaluations. You can gain deeper understanding of yourself and the world. Sure, you may look inconsistent or like you don’t know what you are doing from time to time. You may have trouble to act congruently or to communicate authentically. But if you don’t then you will, as Gandhi says, drive yourself into a false position. A place where you try to uphold or cling to your old views to appear consistent while you realise within that something is wrong. It’s not a fun place to be. To choose to grow and evolve is a happier and more useful path to take.

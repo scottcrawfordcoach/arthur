@@ -1,0 +1,50 @@
+{
+  "schema_name": "ScottBot V5 Final Response Schema",
+  "description": "Defines the structure of the Coaching/Master Agent's final output after merging sub-agent results and applying coaching discipline.",
+  "fields": {
+    "final_text": {
+      "type": "string",
+      "description": "The polished natural-language response delivered to the user."
+    },
+    "ack": {
+      "type": "string",
+      "description": "Concise acknowledgement of the user’s input."
+    },
+    "analysis": {
+      "type": "string",
+      "description": "Summarized analysis combining sub-agent insights."
+    },
+    "reflection_prompt": {
+      "type": "string",
+      "description": "Open-ended question selected according to merge policy and ICF principles."
+    },
+    "db_actions": {
+      "type": "array",
+      "description": "Aggregated database actions from all sub-agents, queued for the Data Handling Agent.",
+      "items": {
+        "type": "object",
+        "properties": {
+          "action_type": { "type": "string" },
+          "target_table": { "type": "string" },
+          "payload": { "type": "object" }
+        }
+      }
+    },
+    "insights": {
+      "type": "array",
+      "description": "Optional insights or correlations the Master chooses to surface.",
+      "items": {
+        "type": "object",
+        "properties": {
+          "type": { "type": "string" },
+          "description": { "type": "string" }
+        }
+      }
+    },
+    "mode": {
+      "type": "string",
+      "enum": ["reflective", "data_driven", "light_touch"],
+      "description": "The preference mode applied when generating the final response."
+    }
+  }
+}

@@ -1,0 +1,158 @@
+{
+  "description": "Advisory Council weight computation policy - determines Teacher/Coach/Problem Solver bias",
+  "version": "1.0.0",
+  "base_weights": {
+    "teacher": 0.33,
+    "coach": 0.33,
+    "problemSolver": 0.34
+  },
+  "project_context": {
+    "feature_flag": true,
+    "topic_shift_threshold": 0.65,
+    "topic_shift_hysteresis": 0.6,
+    "topic_shift_window": 2,
+    "token_caps": {
+      "project": 1500,
+      "history": 1000
+    },
+    "max_project_snippets": 6,
+    "max_history_snippets": 6,
+    "conflict_penalty": 0.15,
+    "stale_penalty": 0.1,
+    "min_project_similarity": 0.55,
+    "min_history_relevance": 0.45,
+    "min_reference_relevance": 0.4,
+    "require_internal_evidence": true,
+    "external_knowledge": {
+      "allowed": true,
+      "require_disclosure": true,
+      "label": "general knowledge",
+      "no_internal_prefix": "Let the user know the repository has no direct matches before sharing broader knowledge."
+    }
+  },
+  "teacher": {
+    "description": "Informational, educational responses with clear explanations",
+    "boosters": [
+      {
+        "name": "high_learning_intent",
+        "signal": "needs.learning_intent",
+        "condition": "> 0.7",
+        "boost": 0.3,
+        "reason": "User explicitly wants to learn"
+      },
+      {
+        "name": "informational_stated_intent",
+        "signal": "needs.stated_intent",
+        "condition": "in ['information', 'learning']",
+        "boost": 0.2,
+        "reason": "Direct informational request"
+      },
+      {
+        "name": "learning_engagement",
+        "signal": "pattern.engagement_level",
+        "condition": "in ['exploratory', 'learning']",
+        "boost": 0.15,
+        "reason": "Showing curiosity patterns"
+      }
+    ]
+  },
+  "coach": {
+    "description": "Supportive, motivational responses with empathy and encouragement",
+    "boosters": [
+      {
+        "name": "high_urgency",
+        "signal": "emotion.urgency",
+        "condition": "> 0.7",
+        "boost": 0.4,
+        "reason": "User is distressed or under pressure"
+      },
+      {
+        "name": "support_needed",
+        "signal": "needs.support_needed",
+        "condition": "length > 0",
+        "boost": 0.3,
+        "reason": "Explicit support request identified"
+      },
+      {
+        "name": "emotional_stated_intent",
+        "signal": "needs.stated_intent",
+        "condition": "in ['emotional_support', 'motivation']",
+        "boost": 0.25,
+        "reason": "Direct emotional need"
+      },
+      {
+        "name": "wellness_behavior",
+        "signal": "pattern.behavior_type",
+        "condition": "in ['wellness_tracking', 'goal_setting']",
+        "boost": 0.2,
+        "reason": "Personal development focus"
+      }
+    ]
+  },
+  "problemSolver": {
+    "description": "Analytical, solution-focused responses with actionable steps",
+    "boosters": [
+      {
+        "name": "high_exploratory",
+        "signal": "pattern.exploratory",
+        "condition": "> 0.6",
+        "boost": 0.3,
+        "reason": "Exploring options or solutions"
+      },
+      {
+        "name": "problem_solving_intent",
+        "signal": "needs.stated_intent",
+        "condition": "in ['problem_solving', 'decision_making']",
+        "boost": 0.25,
+        "reason": "Direct problem to solve"
+      },
+      {
+        "name": "goal_aligned",
+        "signal": "pattern.goal_alignment",
+        "condition": "> 0.5",
+        "boost": 0.2,
+        "reason": "Working toward a specific goal"
+      },
+      {
+        "name": "analytical_engagement",
+        "signal": "pattern.engagement_level",
+        "condition": "== 'analytical'",
+        "boost": 0.15,
+        "reason": "Analytical thinking mode"
+      }
+    ]
+  },
+  "crisis_override": {
+    "description": "Emergency mode: heavily weight Coach when user is in distress",
+    "enabled": true,
+    "conditions": [
+      {
+        "signal": "emotion.urgency",
+        "condition": "> 0.85"
+      },
+      {
+        "signal": "needs.support_needed",
+        "condition": "length > 0"
+      }
+    ],
+    "logic": "AND",
+    "forced_weights": {
+      "teacher": 0.15,
+      "coach": 0.70,
+      "problemSolver": 0.15
+    }
+  },
+  "response_modes": {
+    "description": "Mode thresholds determine which PRIMARY MODE instruction is added to GPT-5 prompt",
+    "teacher_mode_threshold": 0.5,
+    "coach_mode_threshold": 0.5,
+    "problem_solver_mode_threshold": 0.5,
+    "crisis_urgency_threshold": 0.85
+  },
+  "tuning_notes": {
+    "teacher": "Increase boost values to make system more informational/educational",
+    "coach": "Increase boost values to make system more empathetic/supportive",
+    "problemSolver": "Increase boost values to make system more analytical/practical",
+    "crisis_override": "Adjust urgency threshold (0.85) to trigger crisis mode earlier/later"
+  }
+}

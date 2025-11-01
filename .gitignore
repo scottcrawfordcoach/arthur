@@ -1,0 +1,56 @@
+# Dependencies
+node_modules/
+frontend/node_modules/
+package-lock.json
+
+# Environment
+.env
+.env.local
+
+# Database artifacts
+data/
+backend/data/
+*.db
+*.db-shm
+*.db-wal
+
+# Logs
+logs/
+backend/logs/
+**/*.log
+
+# Buckets (keep structure for gitkeep files only)
+buckets/**
+!buckets/
+!buckets/**/
+!buckets/**/.gitkeep
+
+# Build output
+dist/
+build/
+frontend/dist/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Temp
+tmp/
+temp/
+*.tmp
