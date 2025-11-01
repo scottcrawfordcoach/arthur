@@ -3344,3 +3344,5 @@ Perfect — no rush. You’re thinking about this in exactly the right sequence:
 When you’re ready to capture it, we can shape that charter to read like a short, credible “trust contract” — half technical white-paper, half public pledge — but it’ll be much easier once a few of the implementation pieces are locked.
 
 Would you like to keep exploring the **enterprise/privacy balance** next (how you’d technically isolate company-level data from user-owned data inside the same Roundtable instance), or would you prefer to zoom back out and map **Arthur’s next development milestones** from here?
+
+Copyright (c) 2025 Scott Crawford. All rights reserved.

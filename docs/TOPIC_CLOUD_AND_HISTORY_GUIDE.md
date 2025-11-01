@@ -209,3 +209,5 @@ Feature flags allow quick rollback to the current unified list.
 ---
 
 This guide should give tomorrow’s implementation a clear runway: create the topic summary endpoint + cache, build the cloud UI behind a feature flag, wire the full history dropdown to existing components, and add the keyword search surface. Subsequent phases can layer on keyword and embedding-based modes.
+
+Copyright (c) 2025 Scott Crawford. All rights reserved.

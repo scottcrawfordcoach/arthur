@@ -1,3 +1,5 @@
+// Copyright (c) 2025 Scott Crawford. All rights reserved.
+
 /**
  * EmotionKnight.js
  * Analyzes tone, affect, and emotional state from user messages

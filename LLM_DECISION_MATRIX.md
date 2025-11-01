@@ -780,3 +780,5 @@ With parallelization: ~2.2s
 9. ✅ Test full Roundtable pipeline with cost/latency monitoring
 
 **The Roundtable is ready to convene! ⚔️**
+
+Copyright (c) 2025 Scott Crawford. All rights reserved.

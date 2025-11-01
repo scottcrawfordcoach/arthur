@@ -1,3 +1,5 @@
+// Copyright (c) 2025 Scott Crawford. All rights reserved.
+
 import { useState, useRef, useEffect } from 'react';
 import { Send, StopCircle, Upload, Loader2 } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';

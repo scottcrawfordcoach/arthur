@@ -576,3 +576,5 @@ Save as `health-check.sh` and run: `bash health-check.sh`
 4. Reading the error logs
 
 Good luck! 🍀
+
+Copyright (c) 2025 Scott Crawford. All rights reserved.

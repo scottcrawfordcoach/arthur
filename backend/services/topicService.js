@@ -1,3 +1,5 @@
+// Copyright (c) 2025 Scott Crawford. All rights reserved.
+
 import { query, queryOne } from './db.js';
 import { getSessionHistoryView } from './sessionBundler.js';
 import logger from '../utils/logger.js';

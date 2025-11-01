@@ -1,3 +1,5 @@
+// Copyright (c) 2025 Scott Crawford. All rights reserved.
+
 import { useEffect, useState } from 'react';
 import { X } from 'lucide-react';
 

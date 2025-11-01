@@ -380,3 +380,5 @@ The ARTHUR system is now **data-driven** instead of **code-driven**, enabling ra
 **Documentation**: See `POLICY_SYSTEM.md` for full details and tuning guide.
 
 **Questions?** Review `backend/utils/policyLoader.js` for implementation details.
+
+Copyright (c) 2025 Scott Crawford. All rights reserved.

@@ -1,3 +1,5 @@
+// Copyright (c) 2025 Scott Crawford. All rights reserved.
+
 import { exec, spawn } from 'child_process';
 import { promisify } from 'util';
 import { readFile, writeFile, mkdir, copyFile } from 'fs/promises';

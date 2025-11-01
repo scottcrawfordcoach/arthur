@@ -1,3 +1,5 @@
+// Copyright (c) 2025 Scott Crawford. All rights reserved.
+
 import express from 'express';
 import { getTopicSummary, getTopicSnapshot } from '../services/topicService.js';
 import logger from '../utils/logger.js';

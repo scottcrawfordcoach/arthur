@@ -1,3 +1,5 @@
+// Copyright (c) 2025 Scott Crawford. All rights reserved.
+
 /**
  * Migration: Add wellness and journal tracking tables
  * Enables ScottBot journal functionality with qualitative + quantitative tracking

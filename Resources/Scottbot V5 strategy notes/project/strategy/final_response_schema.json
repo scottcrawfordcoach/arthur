@@ -46,5 +46,6 @@
       "enum": ["reflective", "data_driven", "light_touch"],
       "description": "The preference mode applied when generating the final response."
     }
-  }
+  },
+  "_copyright": "Copyright (c) 2025 Scott Crawford. All rights reserved."
 }

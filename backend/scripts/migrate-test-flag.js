@@ -1,3 +1,5 @@
+// Copyright (c) 2025 Scott Crawford. All rights reserved.
+
 /**
  * Migration: Add is_test flag to conversations table
  * 

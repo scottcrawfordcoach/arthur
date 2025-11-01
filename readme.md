@@ -291,7 +291,5 @@ VITE_TOPIC_CLOUD_LIMIT=15
 npm run test:data:seed-topic-cloud
 ```
 
-## Further reading
 
-- Unified Timeline Guide: docs/UNIFIED_TIMELINE_GUIDE.md
-- Topic Cloud Spec: docs/TOPIC_CLOUD_AND_HISTORY_GUIDE.md
+Copyright (c) 2025 Scott Crawford. All rights reserved.

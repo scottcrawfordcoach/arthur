@@ -1,3 +1,5 @@
+// Copyright (c) 2025 Scott Crawford. All rights reserved.
+
 /**
  * TEST: Verify 3D Relevance Scoring Implementation
  * 

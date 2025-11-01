@@ -1,3 +1,5 @@
+// Copyright (c) 2025 Scott Crawford. All rights reserved.
+
 import express from 'express';
 import { query, queryOne } from '../services/db.js';
 import { getBundleById } from '../services/sessionBundler.js';

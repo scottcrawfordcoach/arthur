@@ -363,3 +363,5 @@ After importing:
 4. Add more books as you read them!
 
 Happy reading! 📖✨
+
+Copyright (c) 2025 Scott Crawford. All rights reserved.

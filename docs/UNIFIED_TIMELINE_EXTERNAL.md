@@ -138,3 +138,5 @@ Arthur Roundtable Project
 Unified Timeline System
 © 2025 Scott Crawford — All Rights Reserved
 Proprietary design, methodology, and terminology (Roundtable, Unified Timeline, Council, Librarian, Herald, Advisory, Synthesis) are protected under Scott Crawford’s IP portfolio and may not be reused or rebranded without explicit authorization.
+
+Copyright (c) 2025 Scott Crawford. All rights reserved.

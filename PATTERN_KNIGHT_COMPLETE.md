@@ -425,3 +425,5 @@ const patternSignals = await patternKnight.analyze(userMessage, {
 - ⏳ **Analysis Knight** - Final synthesis
 
 **3 of 5 Knights complete. 60% done! The Roundtable grows stronger! ⚔️**
+
+Copyright (c) 2025 Scott Crawford. All rights reserved.

@@ -1,3 +1,5 @@
+// Copyright (c) 2025 Scott Crawford. All rights reserved.
+
 import { generateEmbedding, searchSimilar } from './embeddings.js';
 import { query, queryOne } from './db.js';
 import logger from '../utils/logger.js';

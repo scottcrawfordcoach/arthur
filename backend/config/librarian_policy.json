@@ -128,5 +128,6 @@
     "recency_decay": "Lower decay_days = more emphasis on recent data (30 is balanced)",
     "compression": "Lower threshold_days = more aggressive compression (saves space, loses detail)",
     "retention": "Enable deletion with caution - data is permanently lost after threshold"
-  }
+  },
+  "_copyright": "Copyright (c) 2025 Scott Crawford. All rights reserved."
 }

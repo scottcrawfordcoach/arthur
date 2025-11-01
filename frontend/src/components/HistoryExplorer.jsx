@@ -1,3 +1,5 @@
+// Copyright (c) 2025 Scott Crawford. All rights reserved.
+
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { X, RefreshCw, Search, Sparkles, ChevronDown, ChevronUp, ExternalLink } from 'lucide-react';
 import UnifiedTimeline from './UnifiedTimeline';

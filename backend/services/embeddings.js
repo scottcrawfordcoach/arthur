@@ -1,3 +1,5 @@
+// Copyright (c) 2025 Scott Crawford. All rights reserved.
+
 import OpenAI from 'openai';
 import logger from '../utils/logger.js';
 

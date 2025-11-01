@@ -558,3 +558,5 @@ The ARTHUR policy system transforms configuration from **hardcoded values** → 
 ---
 
 **Questions?** See `backend/utils/policyLoader.js` for implementation details.
+
+Copyright (c) 2025 Scott Crawford. All rights reserved.

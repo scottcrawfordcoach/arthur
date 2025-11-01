@@ -271,3 +271,5 @@ CREATE TABLE IF NOT EXISTS assistant_chat_session_bundles (
 CREATE INDEX IF NOT EXISTS idx_bundle_session
   ON assistant_chat_session_bundles(session_id, end_created_at DESC);
 ```
+
+Copyright (c) 2025 Scott Crawford. All rights reserved.

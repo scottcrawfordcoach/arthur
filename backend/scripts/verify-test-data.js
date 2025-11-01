@@ -1,3 +1,5 @@
+// Copyright (c) 2025 Scott Crawford. All rights reserved.
+
 /**
  * Verify test data and show how to filter it
  */

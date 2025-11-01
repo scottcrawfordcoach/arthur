@@ -104,3 +104,5 @@ LIMIT 50;
 - Count timeline API p95 latency.
 - Track click-through rate from timeline to snapshot.
 - Track proportion of items with relevance/context hints when `activeQuery` is provided.
+
+Copyright (c) 2025 Scott Crawford. All rights reserved.

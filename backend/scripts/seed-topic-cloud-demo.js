@@ -1,3 +1,5 @@
+// Copyright (c) 2025 Scott Crawford. All rights reserved.
+
 /**
  * Seed a compact dataset tailored for the History Explorer topic cloud demo.
  *

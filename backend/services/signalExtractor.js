@@ -1,3 +1,5 @@
+// Copyright (c) 2025 Scott Crawford. All rights reserved.
+
 /**
  * Signal Extraction Service
  * Inspired by the Roundtable Protocol's Evidence Council

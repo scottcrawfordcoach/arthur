@@ -486,3 +486,5 @@ node backend/scripts/test-arthur-flow.js
 **END OF SESSION CONTEXT**
 
 *This file should be updated after each major implementation milestone.*
+
+Copyright (c) 2025 Scott Crawford. All rights reserved.

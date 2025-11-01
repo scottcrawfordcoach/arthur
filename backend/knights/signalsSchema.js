@@ -1,3 +1,5 @@
+// Copyright (c) 2025 Scott Crawford. All rights reserved.
+
 /**
  * Signal Schema Definitions
  * Defines the structure and validation rules for Knight signals

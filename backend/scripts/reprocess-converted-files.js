@@ -1,3 +1,5 @@
+// Copyright (c) 2025 Scott Crawford. All rights reserved.
+
 /**
  * Re-process existing converted files to fix content in database
  * This script reads the properly converted markdown files and updates the database

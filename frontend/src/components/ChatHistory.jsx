@@ -1,3 +1,5 @@
+// Copyright (c) 2025 Scott Crawford. All rights reserved.
+
 import { useState, useEffect } from 'react';
 import { MessageSquare, Trash2, Edit2, Check, X } from 'lucide-react';
 

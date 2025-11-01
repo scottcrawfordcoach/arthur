@@ -106,3 +106,5 @@ Privacy:
 - Every processed message yields a trace row with totalMs and at least 3 components populated.
 - Failures appear in `errors` and lower successRate in metrics.
 - No user content is stored in trace rows.
+
+Copyright (c) 2025 Scott Crawford. All rights reserved.

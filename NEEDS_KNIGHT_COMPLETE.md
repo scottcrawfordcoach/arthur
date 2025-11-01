@@ -337,3 +337,5 @@ const needsSignals = await needsKnight.analyze(userMessage, {
 - ⏳ **Analysis Knight** - Final synthesis
 
 **2 of 5 Knights complete. The Roundtable is taking shape! ⚔️**
+
+Copyright (c) 2025 Scott Crawford. All rights reserved.

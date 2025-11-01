@@ -178,3 +178,5 @@ Ready for:
 ---
 
 **Note:** This consolidation resolves the "parallel databases" issue discovered during the reference library import. All components now point to the single authoritative database at `./data/db/ai_local.db`.
+
+Copyright (c) 2025 Scott Crawford. All rights reserved.

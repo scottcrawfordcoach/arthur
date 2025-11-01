@@ -1,3 +1,5 @@
+// Copyright (c) 2025 Scott Crawford. All rights reserved.
+
 /**
  * Batch upload ICF resource files
  * Usage: node backend/scripts/batch-upload-icf.js

@@ -474,3 +474,5 @@ The **Advisory Council** system is Arthur's way of translating Evidence Council 
 - Complex situations → Balanced blend
 
 **Test Results:** 8/8 passing, all modes working as designed ✅
+
+Copyright (c) 2025 Scott Crawford. All rights reserved.

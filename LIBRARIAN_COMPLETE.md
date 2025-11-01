@@ -625,3 +625,5 @@ if (councilResult.signals.analysis.herald_recommendation.invoke) {
 
 **Status:** ✅ Librarian COMPLETE  
 **Next:** Build Herald (External Search)
+
+Copyright (c) 2025 Scott Crawford. All rights reserved.

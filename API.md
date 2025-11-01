@@ -552,3 +552,5 @@ This API is designed for local use. For production deployment, add:
 - CORS configuration
 - Error tracking
 - Performance monitoring
+
+Copyright (c) 2025 Scott Crawford. All rights reserved.

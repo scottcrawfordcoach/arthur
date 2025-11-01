@@ -237,3 +237,5 @@ backend/scripts/
 ---
 
 **Next: Build Needs Knight (Phase 3.2)**
+
+Copyright (c) 2025 Scott Crawford. All rights reserved.

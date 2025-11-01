@@ -350,3 +350,5 @@ The synthetic conversation history generator provides a powerful testing infrast
 **Ready to proceed with Phase 3.3 (Evidence Council Coordinator) and Phase 4 (Librarian with 3D scoring implementation).**
 
 🏰 The Roundtable is assembled. The Knights are ready. ⚔️
+
+Copyright (c) 2025 Scott Crawford. All rights reserved.

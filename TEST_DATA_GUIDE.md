@@ -216,3 +216,5 @@ WHERE is_test = 1 AND test_topic = 'authentication';
 ---
 
 **Bottom Line:** Your real chat experience is protected. Test data is isolated and easily manageable. You can test complex scenarios without months of manual conversation.
+
+Copyright (c) 2025 Scott Crawford. All rights reserved.

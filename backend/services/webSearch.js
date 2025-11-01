@@ -1,3 +1,5 @@
+// Copyright (c) 2025 Scott Crawford. All rights reserved.
+
 import fetch from 'node-fetch';
 import logger from '../utils/logger.js';
 

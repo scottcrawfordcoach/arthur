@@ -1,3 +1,5 @@
+// Copyright (c) 2025 Scott Crawford. All rights reserved.
+
 import Database from 'better-sqlite3';
 import path from 'path';
 import { fileURLToPath } from 'url';

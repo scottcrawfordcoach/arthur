@@ -308,3 +308,5 @@ Enjoy your personal AI workspace! 🧠💬✨
 **Built with ❤️ for personal AI assistance**
 
 _All code is yours to modify, extend, and customize!_
+
+Copyright (c) 2025 Scott Crawford. All rights reserved.

@@ -1,3 +1,5 @@
+// Copyright (c) 2025 Scott Crawford. All rights reserved.
+
 import winston from 'winston';
 import { format } from 'winston';
 

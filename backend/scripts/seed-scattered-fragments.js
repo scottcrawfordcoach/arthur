@@ -1,3 +1,5 @@
+// Copyright (c) 2025 Scott Crawford. All rights reserved.
+
 /**
  * Seed scattered conversation fragments across multiple sessions
  * to visualize how revisited topics manifest in thread history.

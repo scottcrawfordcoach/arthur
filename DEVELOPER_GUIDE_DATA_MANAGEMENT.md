@@ -992,3 +992,5 @@ async ageMemories() {
 ---
 
 **Questions?** See `backend/services/Librarian.js` for implementation details.
+
+Copyright (c) 2025 Scott Crawford. All rights reserved.

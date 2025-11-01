@@ -236,4 +236,6 @@ The 3D Relevance Scoring architecture is **COMPLETE** at the Context Knight leve
 
 The Evidence Council is now **80% complete** (4 of 5 Knights ready). Next step: Build Analysis Knight to complete the council, then implement the Librarian to make 3D scoring fully operational.
 
+Copyright (c) 2025 Scott Crawford. All rights reserved.
+
 **"We mustn't allow any context to drift into the past"** ✅ ACHIEVED

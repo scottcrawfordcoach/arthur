@@ -1,3 +1,5 @@
+// Copyright (c) 2025 Scott Crawford. All rights reserved.
+
 import express from 'express';
 import { query, execute } from '../services/db.js';
 import { getProjectBuckets } from '../services/projectBuckets.js';

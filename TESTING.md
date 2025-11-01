@@ -93,3 +93,5 @@ npm run test:ai # Run AI response quality tests
 3. See your conversation appear in sidebar with smart title
 4. Rename anytime by clicking the edit icon
 5. All titles and messages persist between sessions
+
+Copyright (c) 2025 Scott Crawford. All rights reserved.

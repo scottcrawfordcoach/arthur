@@ -1,3 +1,5 @@
+// Copyright (c) 2025 Scott Crawford. All rights reserved.
+
 import { useState } from 'react';
 import { X, Upload, Loader2, CheckCircle, AlertCircle } from 'lucide-react';
 

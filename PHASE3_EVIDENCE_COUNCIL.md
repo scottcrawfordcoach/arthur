@@ -463,3 +463,5 @@ npm run test:council  # Test Evidence Council Coordinator
 ---
 
 **Phase 3: COMPLETE! Ready for Phase 4: Librarian**
+
+Copyright (c) 2025 Scott Crawford. All rights reserved.

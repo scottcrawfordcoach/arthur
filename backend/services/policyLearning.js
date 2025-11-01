@@ -1,3 +1,5 @@
+// Copyright (c) 2025 Scott Crawford. All rights reserved.
+
 /**
  * Policy Learning Service
  * Adapts user-specific policy biases based on natural language feedback

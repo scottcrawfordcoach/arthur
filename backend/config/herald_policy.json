@@ -145,5 +145,6 @@
     "blocked_keywords": "Add terms to prevent searches for inappropriate content",
     "trusted_domains": "Add domains you trust to boost their results in trust scoring",
     "result_limit": "Increase max_results for more comprehensive searches (slower, more expensive)"
-  }
+  },
+  "_copyright": "Copyright (c) 2025 Scott Crawford. All rights reserved."
 }

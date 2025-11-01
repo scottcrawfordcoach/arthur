@@ -1,3 +1,5 @@
+// Copyright (c) 2025 Scott Crawford. All rights reserved.
+
 /**
  * Session bundler keeps a live window of recent messages while archiving older
  * turns into compact bundles that surface in history and the unified timeline.

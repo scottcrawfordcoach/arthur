@@ -1,3 +1,5 @@
+// Copyright (c) 2025 Scott Crawford. All rights reserved.
+
 /**
  * Test KnightBase and Signal Schema
  * Validates the foundation for Evidence Council Knights

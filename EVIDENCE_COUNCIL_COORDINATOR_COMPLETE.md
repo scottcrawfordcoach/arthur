@@ -612,3 +612,5 @@ if (councilResult.signals.analysis.herald_recommendation.invoke) {
 
 **Status:** ✅ Evidence Council Coordinator COMPLETE  
 **Next:** Build Librarian (3D Relevance Scoring + DB Access)
+
+Copyright (c) 2025 Scott Crawford. All rights reserved.

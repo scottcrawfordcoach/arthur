@@ -198,3 +198,5 @@ Success criteria:
 - Snapshot returns within <100ms for typical sessions (<200 rows scanned)
 - No Herald calls on internal/library prompts (verify in traces)
 - Titles generated for >95% sessions without manual edits
+
+Copyright (c) 2025 Scott Crawford. All rights reserved.

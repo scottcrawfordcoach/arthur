@@ -1,3 +1,5 @@
+// Copyright (c) 2025 Scott Crawford. All rights reserved.
+
 import { MessageSquarePlus, Settings, Trash2, RefreshCw, Edit2, Folder } from 'lucide-react';
 import { useState } from 'react';
 

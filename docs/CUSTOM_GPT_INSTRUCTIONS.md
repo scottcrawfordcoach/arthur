@@ -191,3 +191,5 @@ Priority F — Setup and ops
 ---
 
 This instruction set is intended to be pasted into your Custom GPT’s system prompt. Pair it with the Knowledge Pack above for full project awareness.
+
+Copyright (c) 2025 Scott Crawford. All rights reserved.

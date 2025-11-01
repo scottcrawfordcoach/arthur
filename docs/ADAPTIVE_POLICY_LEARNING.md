@@ -167,3 +167,5 @@ Watch the console logs for:
 🎛️  User policy adjusted: reduce_questions
 🎯 PROTOCOL ACTIVE - User Preferences Applied: { ... }
 ```
+
+Copyright (c) 2025 Scott Crawford. All rights reserved.

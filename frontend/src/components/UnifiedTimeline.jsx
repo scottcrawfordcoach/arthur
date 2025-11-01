@@ -1,3 +1,5 @@
+// Copyright (c) 2025 Scott Crawford. All rights reserved.
+
 import { useEffect, useRef, useState, useMemo } from 'react';
 import { Clock, Bot, User, Info, RefreshCw, ChevronDown, ChevronUp, Archive } from 'lucide-react';
 

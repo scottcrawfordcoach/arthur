@@ -258,4 +258,6 @@ Synthesizes everything:
 
 ---
 
+Copyright (c) 2025 Scott Crawford. All rights reserved.
+
 **Following ARTHUR_STRATEGY_v3 Roundtable Architecture**

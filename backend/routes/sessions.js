@@ -1,3 +1,5 @@
+// Copyright (c) 2025 Scott Crawford. All rights reserved.
+
 import express from 'express';
 import { listSessions, updateSessionTitle, deleteSession, backfillSessionTitles } from '../services/chatService.js';
 import logger from '../utils/logger.js';

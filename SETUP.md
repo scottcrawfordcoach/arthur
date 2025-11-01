@@ -393,3 +393,5 @@ Remember:
 - You have full control over all data
 
 Happy chatting! 🤖💬
+
+Copyright (c) 2025 Scott Crawford. All rights reserved.

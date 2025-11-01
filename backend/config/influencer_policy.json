@@ -154,5 +154,6 @@
     "coach": "Increase boost values to make system more empathetic/supportive",
     "problemSolver": "Increase boost values to make system more analytical/practical",
     "crisis_override": "Adjust urgency threshold (0.85) to trigger crisis mode earlier/later"
-  }
+  },
+  "_copyright": "Copyright (c) 2025 Scott Crawford. All rights reserved."
 }

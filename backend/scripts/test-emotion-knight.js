@@ -1,3 +1,5 @@
+// Copyright (c) 2025 Scott Crawford. All rights reserved.
+
 /**
  * Test EmotionKnight
  * Validates emotion analysis for various user messages

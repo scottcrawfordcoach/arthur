@@ -1,3 +1,5 @@
+// Copyright (c) 2025 Scott Crawford. All rights reserved.
+
 /**
  * ScottBot Local - Comprehensive Feature Test Suite
  * Tests all major functionality without requiring manual UI interaction

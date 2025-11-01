@@ -367,3 +367,5 @@ node backend/scripts/test-analysis-knight.js
 **Phase 3: COMPLETE! 🎉**
 
 Ready to build Phase 4: Librarian (3D Relevance Scoring + Database Access)
+
+Copyright (c) 2025 Scott Crawford. All rights reserved.

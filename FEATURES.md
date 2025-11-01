@@ -152,3 +152,5 @@ Run `npm run test:ai` to see the assistant handle various question types! 🚀
 ## 📚 Related Docs
 
 - Unified Timeline Guide: `docs/UNIFIED_TIMELINE_GUIDE.md` — architecture, endpoints, streaming, and integration notes for the recency-first timeline.
+
+Copyright (c) 2025 Scott Crawford. All rights reserved.

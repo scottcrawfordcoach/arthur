@@ -1,3 +1,5 @@
+// Copyright (c) 2025 Scott Crawford. All rights reserved.
+
 /**
  * ScottBot Local - AI Response Quality Tests
  * Tests different types of queries and evaluates response quality

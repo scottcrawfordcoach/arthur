@@ -59,3 +59,5 @@ node -e "const db = require('better-sqlite3')('./data/db/ai_local.db'); const st
 
 ✅ **Credibility boost** integrated into Librarian 3D scoring
 ✅ **Metadata stored** for citation disclaimers
+
+Copyright (c) 2025 Scott Crawford. All rights reserved.

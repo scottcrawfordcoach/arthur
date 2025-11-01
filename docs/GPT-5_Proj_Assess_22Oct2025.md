@@ -130,3 +130,6 @@ Add ESLint/Prettier and optionally TS + Zod
 Add caching for Herald summarization
 You’ll have an even more robust and tunable system—ready to run locally and easy to port to Supabase.
 
+
+Copyright (c) 2025 Scott Crawford. All rights reserved.
+
