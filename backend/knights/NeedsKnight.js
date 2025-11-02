@@ -26,31 +26,21 @@
 
 import KnightBase from './KnightBase.js';
 import OpenAI from 'openai';
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 class NeedsKnight extends KnightBase {
   constructor() {
     super('needs');
     this.openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
     
-    // Intent patterns for quick analysis fallback
-    this.intentPatterns = {
-      information: /\b(what|how|why|when|where|who|explain|tell me|show me)\b/i,
-      validation: /\b(right|correct|good|okay|should I|is this|am I)\b/i,
-      guidance: /\b(help|stuck|don't know|unsure|confused|lost)\b/i,
-      emotional_support: /\b(feel|feeling|frustrated|scared|worried|anxious|upset)\b/i,
-      problem_solving: /\b(fix|solve|work|broken|error|issue|problem)\b/i,
-      exploration: /\b(think|consider|maybe|wondering|curious|interested)\b/i,
-      goal_setting: /\b(want to|need to|trying to|working on|goal|plan)\b/i
-    };
-    
-    this.supportTypes = [
-      'emotional_support',
-      'information',
-      'guidance',
-      'validation',
-      'problem_solving',
-      'encouragement'
-    ];
+    // Load policy
+    const policyPath = path.join(__dirname, '../config/needs_knight_policy.json');
+    this.policy = JSON.parse(fs.readFileSync(policyPath, 'utf8'));
   }
 
   /**
@@ -78,65 +68,89 @@ class NeedsKnight extends KnightBase {
   }
 
   /**
-   * Quick pattern-based needs analysis
+   * Quick pattern-based needs analysis using policy
    * @param {string} userMessage - The user's message
    * @returns {Object} Basic needs signals
    */
   quickAnalysis(userMessage) {
     const lowerMessage = userMessage.toLowerCase();
+    const policy = this.policy || {};
+    
+    // Build intent patterns from policy with safe defaults
+    const intentPatterns = {};
+    const policyIntents = policy?.intent_patterns || {};
+    for (const [intentType, data] of Object.entries(policyIntents)) {
+      const keywords = (data?.keywords || []).join('|');
+      if (keywords) {
+        intentPatterns[intentType] = new RegExp(`\\b(${keywords})\\b`, 'i');
+      }
+    }
     
     // Detect stated intent
     let stated_intent = 'information'; // default
     let latent_need = 'information';
     
-    if (this.intentPatterns.guidance.test(lowerMessage)) {
-      stated_intent = 'guidance';
-      latent_need = 'emotional_support'; // Often seeking reassurance when stuck
-    } else if (this.intentPatterns.validation.test(lowerMessage)) {
-      stated_intent = 'validation';
-      latent_need = 'validation';
-    } else if (this.intentPatterns.emotional_support.test(lowerMessage)) {
-      stated_intent = 'emotional_support';
-      latent_need = 'emotional_support';
-    } else if (this.intentPatterns.problem_solving.test(lowerMessage)) {
-      stated_intent = 'problem_solving';
-      latent_need = 'problem_solving';
-    } else if (this.intentPatterns.exploration.test(lowerMessage)) {
-      stated_intent = 'exploration';
-      latent_need = 'guidance';
-    } else if (this.intentPatterns.goal_setting.test(lowerMessage)) {
-      stated_intent = 'goal_setting';
-      latent_need = 'guidance';
+    // Check each intent pattern from policy
+    for (const [intentType, pattern] of Object.entries(intentPatterns)) {
+      if (pattern.test(lowerMessage)) {
+        stated_intent = intentType;
+        // Use latent_need from policy if defined
+        latent_need = policy.intent_patterns[intentType].latent_need || intentType;
+        break;
+      }
     }
     
-    // Learning intent (questions vs commands)
+    // Learning intent detection using policy indicators
     const hasQuestion = /\?/.test(userMessage);
-    const hasWhy = /\b(why|how does|how do|explain)\b/i.test(lowerMessage);
-    const learning_intent = hasWhy ? 0.8 : (hasQuestion ? 0.6 : 0.3);
+    const highLearning = policy?.learning_intent_indicators?.high || [];
+    const mediumLearning = policy?.learning_intent_indicators?.medium || [];
     
-    // Support needed
+    let learning_intent = 0.3; // default low
+    if (highLearning.some(ind => lowerMessage.includes(ind))) {
+      learning_intent = 0.8;
+    } else if (mediumLearning.some(ind => lowerMessage.includes(ind))) {
+      learning_intent = 0.6;
+    } else if (hasQuestion) {
+      learning_intent = 0.5;
+    }
+    
+    // Support needed using policy support types
     const support_needed = [];
-    if (this.intentPatterns.emotional_support.test(lowerMessage)) {
+    if (intentPatterns.emotional_support && intentPatterns.emotional_support.test(lowerMessage)) {
       support_needed.push('emotional_support');
     }
-    if (this.intentPatterns.information.test(lowerMessage)) {
+    if (intentPatterns.information && intentPatterns.information.test(lowerMessage)) {
       support_needed.push('information');
     }
-    if (this.intentPatterns.guidance.test(lowerMessage)) {
+    if (intentPatterns.guidance && intentPatterns.guidance.test(lowerMessage)) {
       support_needed.push('guidance');
     }
-    if (this.intentPatterns.validation.test(lowerMessage)) {
+    if (intentPatterns.validation && intentPatterns.validation.test(lowerMessage)) {
       support_needed.push('validation');
+    }
+    if (intentPatterns.problem_solving && intentPatterns.problem_solving.test(lowerMessage)) {
+      support_needed.push('problem_solving');
     }
     if (support_needed.length === 0) {
       support_needed.push('information'); // default
     }
     
-    // Goal alignment (harder to detect from single message)
-    const goal_alignment = this.intentPatterns.goal_setting.test(lowerMessage) ? 0.7 : 0.5;
+    // Goal alignment using policy indicators
+    const alignedIndicators = policy?.goal_alignment_indicators?.aligned || [];
+    const exploringIndicators = policy?.goal_alignment_indicators?.exploring || [];
+    const blockedIndicators = policy?.goal_alignment_indicators?.blocked || [];
+    
+    let goal_alignment = 0.5; // default neutral
+    if (alignedIndicators.some(ind => lowerMessage.includes(ind))) {
+      goal_alignment = 0.8;
+    } else if (blockedIndicators.some(ind => lowerMessage.includes(ind))) {
+      goal_alignment = 0.3;
+    } else if (exploringIndicators.some(ind => lowerMessage.includes(ind))) {
+      goal_alignment = 0.5;
+    }
     
     // Exploratory
-    const exploratory = this.intentPatterns.exploration.test(lowerMessage) ? 0.8 : 0.3;
+    const exploratory = (intentPatterns.exploration && intentPatterns.exploration.test(lowerMessage)) ? 0.8 : 0.3;
     
     return {
       stated_intent,
@@ -145,7 +159,7 @@ class NeedsKnight extends KnightBase {
       support_needed,
       goal_alignment,
       exploratory,
-      needs_confidence: 0.6 // Pattern-based is less confident
+      needs_confidence: policy?.confidence_thresholds?.pattern_match || 0.65
     };
   }
 

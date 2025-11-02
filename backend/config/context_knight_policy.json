@@ -1,0 +1,98 @@
+{
+  "description": "Context Knight policy - governs what context sources to search based on signals",
+  "version": "1.0.0",
+  
+  "search_tiers": {
+    "description": "Available knowledge tiers for semantic search",
+    "all": ["reference_library", "personal_journal", "conversation"],
+    "reference_library": "Book summaries, articles, curated knowledge",
+    "personal_journal": "User's journal entries and reflections",
+    "conversation": "Past chat history with assistant"
+  },
+  
+  "context_rules": {
+    "description": "Which tiers to search based on detected signals",
+    
+    "crisis_or_high_urgency": {
+      "condition": "emotion.urgency > 0.7 OR emotion.risk > 0.5",
+      "tiers": ["all"],
+      "limit": 12,
+      "time_range": "all",
+      "scoring": {
+        "semantic_weight": 0.3,
+        "recency_weight": 0.35,
+        "frequency_weight": 0.2,
+        "vehemence_weight": 0.15
+      },
+      "priority": ["conversation_history", "semantic_search"],
+      "conversation_lookback": "24 hours"
+    },
+    
+    "learning_intent": {
+      "condition": "needs.learning_intent > 0.6",
+      "tiers": ["reference_library"],
+      "limit": 15,
+      "time_range": "all",
+      "scoring": {
+        "semantic_weight": 0.5,
+        "recency_weight": 0.2,
+        "frequency_weight": 0.15,
+        "vehemence_weight": 0.15
+      }
+    },
+    
+    "emotional_support": {
+      "condition": "needs.support_needed includes 'emotional'",
+      "query": "emotional support strategies that worked before",
+      "tiers": ["all"],
+      "limit": 8,
+      "time_range": "all",
+      "scoring": {
+        "semantic_weight": 0.3,
+        "recency_weight": 0.3,
+        "frequency_weight": 0.2,
+        "vehemence_weight": 0.2
+      },
+      "request_user_data": ["coping_strategies"]
+    },
+    
+    "recurring_topics": {
+      "condition": "pattern.recurring_topics.length > 0",
+      "tiers": ["all"],
+      "limit": 10,
+      "time_range": "all",
+      "scoring": {
+        "semantic_weight": 0.35,
+        "recency_weight": 0.2,
+        "frequency_weight": 0.3,
+        "vehemence_weight": 0.15
+      }
+    },
+    
+    "default": {
+      "condition": "No specific patterns detected",
+      "tiers": ["all"],
+      "limit": 10,
+      "time_range": "all",
+      "scoring": {
+        "semantic_weight": 0.4,
+        "recency_weight": 0.25,
+        "frequency_weight": 0.2,
+        "vehemence_weight": 0.15
+      }
+    }
+  },
+  
+  "novelty_threshold": {
+    "description": "Thresholds for determining if topic is new or recurring",
+    "recurring_topic_present": 0.3,
+    "no_recurring_topics": 0.8
+  },
+  
+  "limits": {
+    "description": "Maximum limits to prevent excessive searches",
+    "max_semantic_searches_per_request": 5,
+    "max_results_per_search": 20,
+    "max_conversation_history_hours": 168
+  }
+}

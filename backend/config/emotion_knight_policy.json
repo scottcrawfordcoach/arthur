@@ -1,0 +1,92 @@
+{
+  "description": "Emotion Knight policy - governs emotion and crisis detection patterns",
+  "version": "1.0.0",
+  
+  "crisis_patterns": {
+    "description": "Regex patterns for detecting crisis/emergency situations",
+    "risk_keywords": [
+      "suicide",
+      "kill myself",
+      "end it all",
+      "not worth living",
+      "hurt myself",
+      "self harm",
+      "can't go on",
+      "no point",
+      "give up",
+      "done with"
+    ],
+    "urgent_keywords": [
+      "help",
+      "urgent",
+      "emergency",
+      "crisis",
+      "desperate",
+      "can't take"
+    ],
+    "risk_threshold": 0.9,
+    "urgency_threshold": 0.8
+  },
+  
+  "sentiment_words": {
+    "description": "Word lists for basic sentiment analysis",
+    "negative": [
+      "terrible",
+      "awful",
+      "horrible",
+      "frustrated",
+      "angry",
+      "sad",
+      "depressed",
+      "anxious",
+      "stressed",
+      "worried",
+      "scared",
+      "stuck",
+      "failing",
+      "hopeless",
+      "exhausted",
+      "overwhelmed",
+      "breaking"
+    ],
+    "positive": [
+      "great",
+      "amazing",
+      "excellent",
+      "happy",
+      "excited",
+      "motivated",
+      "energized",
+      "confident",
+      "grateful",
+      "optimistic",
+      "hopeful",
+      "proud",
+      "accomplished",
+      "successful",
+      "thrilled",
+      "fantastic"
+    ]
+  },
+  
+  "mood_detection": {
+    "description": "Patterns for detecting specific moods",
+    "anxious": ["anxious", "worried", "nervous", "scared", "panicking", "stressed"],
+    "depressed": ["depressed", "sad", "hopeless", "empty", "numb", "worthless"],
+    "angry": ["angry", "furious", "mad", "irritated", "frustrated", "rage"],
+    "excited": ["excited", "thrilled", "pumped", "energized", "motivated"],
+    "calm": ["calm", "peaceful", "relaxed", "content", "serene"]
+  },
+  
+  "energy_level_indicators": {
+    "low": ["exhausted", "tired", "drained", "fatigued", "worn out", "can't"],
+    "medium": ["okay", "fine", "normal", "regular"],
+    "high": ["energized", "pumped", "ready", "motivated", "excited"]
+  },
+  
+  "confidence_thresholds": {
+    "crisis_detection": 0.95,
+    "pattern_match": 0.7,
+    "llm_analysis": 0.85
+  }
+}

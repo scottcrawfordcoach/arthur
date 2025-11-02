@@ -26,11 +26,21 @@
 
 import KnightBase from './KnightBase.js';
 import OpenAI from 'openai';
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 class AnalysisKnight extends KnightBase {
   constructor() {
     super('analysis');
     this.openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+    
+    // Load policy
+    const policyPath = path.join(__dirname, '../config/analysis_knight_policy.json');
+    this.policy = JSON.parse(fs.readFileSync(policyPath, 'utf8'));
   }
 
   /**
@@ -67,6 +77,7 @@ class AnalysisKnight extends KnightBase {
    */
   quickAnalysis(userMessage, signals) {
     const { emotion, needs, pattern, contextKnight } = signals;
+    const policy = this.policy || {};
     
     // Default synthesis
     const synthesized_signals = {
@@ -76,7 +87,7 @@ class AnalysisKnight extends KnightBase {
       pattern_context: pattern?.recurring_topics?.length > 0 ? 'recurring' : 'novel'
     };
     
-    // Herald recommendation logic
+    // Herald recommendation logic using policy
     const herald_recommendation = {
       invoke: false,
       reason: '',
@@ -84,12 +95,16 @@ class AnalysisKnight extends KnightBase {
       priority: 'none'
     };
     
-    // Internal-first guardrails
+    // Internal-first guardrails from policy with safe defaults
     const msg = (userMessage || '').toLowerCase();
-    const userRequestedInternalOnly = /(without\s+using\s+(a\s+)?web\s+search|no\s+web(\s+search)?|local\s+only|internal\s+only|from\s+(your|my)\s+(files|library|reference\s+library))/i.test(msg);
+    const heraldPolicy = policy?.herald_invocation || {};
+    const internalPatterns = heraldPolicy?.internal_first_patterns?.keywords || [];
+    const libraryPatterns = heraldPolicy?.library_intent_patterns?.keywords || [];
+    
+    const userRequestedInternalOnly = internalPatterns.some(pattern => msg.includes(pattern.toLowerCase()));
     const hasReferenceLibraryRequest = Array.isArray(contextKnight?.context_requests?.semantic_search)
       && contextKnight.context_requests.semantic_search.some(s => (s.tier === 'reference_library'));
-    const libraryIntent = /(reference\s+library|your\s+library|books\s+in\s+(your|the)\s+library|book\s+list|list\s+of\s+books)/i.test(msg);
+    const libraryIntent = libraryPatterns.some(pattern => msg.includes(pattern.toLowerCase()));
     
     if (userRequestedInternalOnly || hasReferenceLibraryRequest || libraryIntent) {
       herald_recommendation.invoke = false;
@@ -100,49 +115,85 @@ class AnalysisKnight extends KnightBase {
       herald_recommendation.priority = 'none';
     }
     
-    // Invoke Herald if:
-    // 1. High learning intent + novel topic + no patterns
-    if (!herald_recommendation.invoke && (needs?.learning_intent > 0.7 && contextKnight?.novelty > 0.7)) {
-      // Only consider Herald if not explicitly guarded by internal-first rules
+    // Invoke Herald based on policy rules
+    const invokeRules = policy?.herald_invocation?.invoke_conditions || {};
+    
+    // Rule 1: High learning intent + novel topic
+    const learningRule = invokeRules?.high_learning_novel_topic || {};
+    if (!herald_recommendation.invoke && 
+        needs?.learning_intent > (learningRule.learning_intent_threshold || 0.7) && 
+        contextKnight?.novelty > (learningRule.novelty_threshold || 0.7)) {
       herald_recommendation.invoke = true;
-      herald_recommendation.reason = 'New learning topic with no historical context';
+      herald_recommendation.reason = learningRule.reason || 'New learning topic with no historical context';
       herald_recommendation.search_query = userMessage;
-      herald_recommendation.priority = 'primary';
+      herald_recommendation.priority = learningRule.priority || 'primary';
     }
     
-    // 2. Explicit question pattern with no known context
-    const questionPatterns = /^(what|how|why|when|where|who|can you explain|tell me about)/i;
-    if (!herald_recommendation.invoke && questionPatterns.test(userMessage.trim()) && contextKnight?.novelty > 0.6) {
+    // Rule 2: Direct question with novelty
+    const questionRule = invokeRules?.direct_question_novel || {};
+    const questionPatterns = (questionRule.question_patterns || []).map(p => new RegExp(p, 'i'));
+    const isQuestion = questionPatterns.some(pattern => pattern.test(userMessage.trim()));
+    
+    if (!herald_recommendation.invoke && 
+        isQuestion && 
+        contextKnight?.novelty > (questionRule.novelty_threshold || 0.6)) {
       herald_recommendation.invoke = true;
-      herald_recommendation.reason = 'Direct question about potentially unfamiliar topic';
+      herald_recommendation.reason = questionRule.reason || 'Direct question about potentially unfamiliar topic';
       herald_recommendation.search_query = userMessage;
-      herald_recommendation.priority = 'fallback';
+      herald_recommendation.priority = questionRule.priority || 'fallback';
     }
     
-    // Detect ambiguity
+    // Detect ambiguity using policy rules
     const ambiguity_detected = [];
+    const ambiguityRules = policy?.ambiguity_detection?.contradictions || [];
     
-    // Check for signal contradictions
-    if (emotion?.urgency > 0.7 && needs?.learning_intent > 0.7) {
-      ambiguity_detected.push('High urgency conflicts with deep learning intent');
+    for (const rule of ambiguityRules) {
+      let detected = false;
+      
+      // Evaluate condition dynamically
+      if (rule.name === 'urgency_vs_learning' && 
+          emotion?.urgency > 0.7 && needs?.learning_intent > 0.7) {
+        detected = true;
+      } else if (rule.name === 'negative_emotion_vs_exploration' && 
+                 emotion?.sentiment < -0.5 && needs?.exploratory > 0.7) {
+        detected = true;
+      } else if (rule.name === 'crisis_vs_casual' && 
+                 emotion?.risk > 0.8 && emotion?.urgency < 0.3) {
+        detected = true;
+      }
+      
+      if (detected) {
+        ambiguity_detected.push(rule.message);
+      }
     }
     
-    if (emotion?.sentiment < -0.5 && needs?.exploratory > 0.7) {
-      ambiguity_detected.push('Negative emotion conflicts with exploratory intent');
-    }
-    
-    // Knowledge gaps
+    // Knowledge gaps using policy
     const knowledge_gaps = [];
+    const gapRules = policy?.knowledge_gaps?.gap_conditions || [];
     
-    if (contextKnight?.novelty > 0.7 && !pattern?.recurring_topics?.length) {
-      knowledge_gaps.push('No historical context for this topic');
+    for (const rule of gapRules) {
+      let detected = false;
+      
+      if (rule.name === 'no_historical_context' && 
+          contextKnight?.novelty > 0.7 && !pattern?.recurring_topics?.length) {
+        detected = true;
+      } else if (rule.name === 'risk_without_coping_data' && 
+                 emotion?.risk > 0.6 && 
+                 (!contextKnight?.context_requests?.user_data || contextKnight.context_requests.user_data.length === 0)) {
+        detected = true;
+      } else if (rule.name === 'learning_without_resources' && 
+                 needs?.learning_intent > 0.7 && 
+                 (!contextKnight?.context_requests?.semantic_search || 
+                  !contextKnight.context_requests.semantic_search.some(s => s.tier === 'reference_library'))) {
+        detected = true;
+      }
+      
+      if (detected) {
+        knowledge_gaps.push(rule.message);
+      }
     }
     
-    if (emotion?.risk > 0.6 && (!contextKnight?.context_requests?.user_data || contextKnight.context_requests.user_data.length === 0)) {
-      knowledge_gaps.push('High risk but no user coping strategies retrieved');
-    }
-    
-    // Overall confidence
+    // Overall confidence using policy
     const confidence = this.calculateConfidence({
       emotion,
       needs,
@@ -360,10 +411,16 @@ Respond with ONLY valid JSON:
       
       // Apply internal-first overrides even after LLM synthesis
       const msg = (userMessage || '').toLowerCase();
-      const userRequestedInternalOnly = /(without\s+using\s+(a\s+)?web\s+search|no\s+web(\s+search)?|local\s+only|internal\s+only|from\s+(your|my)\s+(files|library|reference\s+library))/i.test(msg);
+      const policy = this.policy || {};
+      const heraldPolicy = policy?.herald_invocation || {};
+      const internalPatterns = heraldPolicy?.internal_first_patterns?.keywords || [];
+      const libraryPatterns = heraldPolicy?.library_intent_patterns?.keywords || [];
+      
+      const userRequestedInternalOnly = internalPatterns.some(pattern => msg.includes(pattern.toLowerCase()));
       const hasReferenceLibraryRequest = Array.isArray(contextKnight?.context_requests?.semantic_search)
         && contextKnight.context_requests.semantic_search.some(s => (s.tier === 'reference_library'));
-      const libraryIntent = /(reference\s+library|your\s+library|books\s+in\s+(your|the)\s+library|book\s+list|list\s+of\s+books)/i.test(msg);
+      const libraryIntent = libraryPatterns.some(pattern => msg.includes(pattern.toLowerCase()));
+      
       if (userRequestedInternalOnly || hasReferenceLibraryRequest || libraryIntent) {
         validatedSignals.herald_recommendation = {
           invoke: false,
@@ -460,48 +517,96 @@ Respond with ONLY valid JSON:
   }
 
   /**
-   * Calculate confidence based on signal quality
+   * Calculate confidence based on signal quality using policy
    * @param {Object} signals - All signals
    * @returns {number} Confidence score 0-1
    */
   calculateConfidence(signals) {
-    let confidence = 0.7; // baseline
+    const policy = this.policy?.confidence_calculation || {};
+    let confidence = policy.base_confidence || 0.7;
     
     const { emotion, needs, pattern, contextKnight, ambiguity_detected } = signals;
     
-    // Increase confidence with clear signals
-    if (emotion && emotion.urgency !== undefined) confidence += 0.05;
-    if (needs && needs.needs_confidence > 0.7) confidence += 0.1;
-    if (pattern && pattern.pattern_strength > 0.7) confidence += 0.1;
-    if (contextKnight && contextKnight.novelty !== undefined) confidence += 0.05;
+    // Apply policy adjustments with safe defaults
+    const adjustments = policy.adjustments || {};
     
-    // Decrease confidence with ambiguity
-    if (ambiguity_detected && ambiguity_detected.length > 0) {
-      confidence -= (ambiguity_detected.length * 0.1);
+    // High emotion signals increase confidence
+    if (adjustments.high_emotion_signals && emotion && 
+        (emotion.urgency > 0.5 || emotion.risk > 0.5)) {
+      confidence += adjustments.high_emotion_signals.adjustment;
     }
     
-    return this.clamp(confidence, 0, 1);
+    // Ambiguity detected decreases confidence
+    if (adjustments.ambiguity_detected && ambiguity_detected && ambiguity_detected.length > 0) {
+      confidence += adjustments.ambiguity_detected.adjustment;
+    }
+    
+    // No pattern data decreases confidence
+    if (adjustments.no_pattern_data && (!pattern || pattern.pattern_strength < 0.3)) {
+      confidence += adjustments.no_pattern_data.adjustment;
+    }
+    
+    // All knights agree increases confidence
+    if (adjustments.all_knights_agree && emotion && needs && pattern &&
+        emotion.mood !== 'neutral' && needs.needs_confidence > 0.7 && pattern.pattern_strength > 0.5) {
+      confidence += adjustments.all_knights_agree.adjustment;
+    }
+    
+    return this.clamp(confidence, policy.min_confidence || 0.3, policy.max_confidence || 0.95);
   }
 
   /**
-   * Determine primary recommendation for Arthur
+   * Determine primary recommendation for Arthur using policy
    * @param {Object} signals - Key signals
    * @returns {string} Recommendation
    */
   determineRecommendation(signals) {
     const { emotion, needs, pattern, herald_recommendation } = signals;
+    const policy = this.policy?.recommendation_rules || {};
     
-    // Crisis takes priority
-    if (emotion?.risk > 0.7 || emotion?.urgency > 0.8) {
-      return 'provide_emotional_support';
+    // Check priorities in order from policy with safe defaults
+    const priorities = policy.priorities || [];
+    for (const rule of priorities) {
+      let conditionMet = false;
+      
+      switch (rule.action) {
+        case 'provide_crisis_support':
+          if (emotion?.risk > 0.7 || emotion?.urgency > 0.8) {
+            conditionMet = true;
+          }
+          break;
+        
+        case 'invoke_herald':
+          if (herald_recommendation?.invoke && herald_recommendation.priority === 'primary') {
+            conditionMet = true;
+          }
+          break;
+        
+        case 'provide_emotional_support':
+          if (needs?.support_needed?.includes('emotional_support') && emotion?.sentiment < -0.4) {
+            conditionMet = true;
+          }
+          break;
+        
+        case 'answer_from_context':
+          if (pattern?.recurring_topics?.length > 0 || needs?.learning_intent > 0.5) {
+            conditionMet = true;
+          }
+          break;
+        
+        case 'explore_with_user':
+          if (needs?.exploratory > 0.6 || (signals.ambiguity_detected && signals.ambiguity_detected.length > 0)) {
+            conditionMet = true;
+          }
+          break;
+      }
+      
+      if (conditionMet) {
+        return rule.action;
+      }
     }
     
-    // Herald invocation
-    if (herald_recommendation?.invoke && herald_recommendation.priority === 'primary') {
-      return 'invoke_herald_first';
-    }
-    
-    // Learning intent
+    // Default fallback
     if (needs?.learning_intent > 0.7) {
       return 'answer_learning_question';
     }

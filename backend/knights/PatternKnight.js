@@ -26,32 +26,21 @@
 
 import KnightBase from './KnightBase.js';
 import OpenAI from 'openai';
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 class PatternKnight extends KnightBase {
   constructor() {
     super('pattern');
     this.openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
     
-    // Topic patterns for quick analysis
-    this.topicPatterns = {
-      authentication: /\b(auth|login|password|token|session|jwt|oauth)\b/i,
-      database: /\b(database|sql|query|schema|table|migration|postgres|sqlite)\b/i,
-      frontend: /\b(react|component|ui|css|html|frontend|dom|render)\b/i,
-      backend: /\b(server|api|endpoint|route|express|node|backend)\b/i,
-      deployment: /\b(deploy|production|docker|container|aws|cloud|hosting)\b/i,
-      testing: /\b(test|testing|jest|unit|integration|coverage)\b/i,
-      performance: /\b(slow|performance|optimize|cache|speed|latency)\b/i,
-      debugging: /\b(bug|error|debug|issue|problem|broken|fix)\b/i,
-      architecture: /\b(architecture|design|pattern|structure|organize)\b/i,
-      learning: /\b(learn|understand|tutorial|how to|explain|teach)\b/i
-    };
-    
-    this.rhythmPatterns = {
-      daily: 'Messages consistently spread across multiple days',
-      sporadic: 'Irregular gaps between conversations',
-      intensive: 'Bursts of many messages in short timeframe',
-      single_session: 'One conversation session only'
-    };
+    // Load policy
+    const policyPath = path.join(__dirname, '../config/pattern_knight_policy.json');
+    this.policy = JSON.parse(fs.readFileSync(policyPath, 'utf8'));
   }
 
   /**
@@ -88,12 +77,14 @@ class PatternKnight extends KnightBase {
   }
 
   /**
-   * Quick pattern-based analysis
+   * Quick pattern-based analysis using policy
    * @param {string} userMessage - Current message
    * @param {Array} conversationHistory - Previous messages
    * @returns {Object} Basic pattern signals
    */
   quickAnalysis(userMessage, conversationHistory) {
+    const policy = this.policy || {};
+    
     // If no history, return minimal signals
     if (conversationHistory.length === 0) {
       return {
@@ -101,19 +92,29 @@ class PatternKnight extends KnightBase {
         topic_frequency: {},
         conversation_rhythm: 'single_session',
         behavior_trends: [],
-        pattern_strength: 0.3
+        pattern_strength: policy?.confidence_thresholds?.no_history || 0.3
       };
     }
 
     // Combine current message with history
     const allMessages = [...conversationHistory.map(m => m.message || m.text || ''), userMessage];
     
+    // Build topic patterns from policy with safe defaults
+    const topicPatterns = {};
+    const policyTopics = policy?.topic_patterns || {};
+    for (const [category, data] of Object.entries(policyTopics)) {
+      const keywords = (data?.keywords || []).join('|');
+      if (keywords) {
+        topicPatterns[category] = new RegExp(`\\b(${keywords})\\b`, 'i');
+      }
+    }
+    
     // Detect topics across all messages
     const topicCounts = {};
     const detectedTopics = new Set();
     
     allMessages.forEach(message => {
-      Object.entries(this.topicPatterns).forEach(([topic, pattern]) => {
+      Object.entries(topicPatterns).forEach(([topic, pattern]) => {
         if (pattern.test(message)) {
           topicCounts[topic] = (topicCounts[topic] || 0) + 1;
           detectedTopics.add(topic);
@@ -121,9 +122,10 @@ class PatternKnight extends KnightBase {
       });
     });
     
-    // Recurring topics (appeared 2+ times)
+    // Recurring topics using policy threshold
+    const recurringThreshold = policy?.recurring_topic_threshold?.min_occurrences || 2;
     const recurring_topics = Object.entries(topicCounts)
-      .filter(([_, count]) => count >= 2)
+      .filter(([_, count]) => count >= recurringThreshold)
       .map(([topic, _]) => topic);
     
     // Detect conversation rhythm from timestamps
@@ -138,13 +140,13 @@ class PatternKnight extends KnightBase {
       }
     }
     
-    // Simple behavior trends from topic patterns
+    // Behavioral trends using policy
     const behavior_trends = [];
-    if (topicCounts.debugging >= 3) {
-      behavior_trends.push('troubleshooting_focused');
-    }
     if (topicCounts.learning >= 2) {
       behavior_trends.push('learning_oriented');
+    }
+    if (topicCounts.debugging >= 3) {
+      behavior_trends.push('troubleshooting_focused');
     }
     if (detectedTopics.size >= 5) {
       behavior_trends.push('wide_ranging_exploration');
@@ -153,8 +155,16 @@ class PatternKnight extends KnightBase {
       behavior_trends.push('iterative_problem_solving');
     }
     
-    // Pattern strength based on history size
-    const pattern_strength = Math.min(conversationHistory.length / 10, 0.7);
+    // Pattern strength based on history size and policy confidence thresholds
+    let pattern_strength;
+    const thresholds = policy?.confidence_thresholds || {};
+    if (conversationHistory.length >= 10) {
+      pattern_strength = thresholds.high || 0.8;
+    } else if (conversationHistory.length >= 5) {
+      pattern_strength = thresholds.medium || 0.5;
+    } else {
+      pattern_strength = thresholds.low || 0.3;
+    }
     
     return {
       recurring_topics,
@@ -166,12 +176,15 @@ class PatternKnight extends KnightBase {
   }
 
   /**
-   * Detect conversation rhythm from timestamps
+   * Detect conversation rhythm from timestamps using policy rules
    * @param {Array<Date>} timestamps - Conversation timestamps
    * @returns {string} Rhythm pattern
    */
   detectRhythm(timestamps) {
     if (timestamps.length < 2) return 'single_session';
+    
+    const policy = this.policy || {};
+    const rhythmRules = policy?.rhythm_detection || {};
     
     const sorted = timestamps.sort((a, b) => a - b);
     const gaps = [];
@@ -180,19 +193,32 @@ class PatternKnight extends KnightBase {
       const gapHours = (sorted[i] - sorted[i-1]) / (1000 * 60 * 60);
       gaps.push(gapHours);
     }
-    
     const avgGap = gaps.reduce((a, b) => a + b, 0) / gaps.length;
     const maxGap = Math.max(...gaps);
     const minGap = Math.min(...gaps);
     
-    // All within same day (< 24 hours)
-    if (maxGap < 24) return 'intensive';
+    // Use policy rhythm detection rules with safe defaults
+    const dailyRule = rhythmRules?.daily || {};
+    const sporadicRule = rhythmRules?.sporadic || {};
+    const intensiveRule = rhythmRules?.intensive || {};
     
-    // Regular daily pattern (gaps around 24 hours)
-    if (avgGap > 20 && avgGap < 30 && maxGap < 48) return 'daily';
+    // Check intensive (bursts of messages)
+    if (maxGap < (intensiveRule.max_gap_hours || 24)) {
+      return 'intensive';
+    }
     
-    // Irregular gaps
-    if (maxGap > avgGap * 3) return 'sporadic';
+    // Check daily pattern
+    const minAvg = dailyRule.min_avg_gap_hours || 20;
+    const maxAvg = dailyRule.max_avg_gap_hours || 30;
+    if (avgGap >= minAvg && avgGap <= maxAvg) {
+      return 'daily';
+    }
+    
+    // Check sporadic (irregular gaps)
+    const maxMultiplier = sporadicRule.max_gap_multiplier || 3;
+    if (maxGap > maxMultiplier * avgGap) {
+      return 'sporadic';
+    }
     
     return 'regular';
   }

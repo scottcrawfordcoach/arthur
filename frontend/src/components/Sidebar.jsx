@@ -1,7 +1,8 @@
 // Copyright (c) 2025 Scott Crawford. All rights reserved.
 
-import { MessageSquarePlus, Settings, Trash2, RefreshCw, Edit2, Folder } from 'lucide-react';
+import { MessageSquarePlus, Settings, Trash2, RefreshCw, Edit2, Folder, Cloud, List } from 'lucide-react';
 import { useState } from 'react';
+import TopicCloud from './TopicCloud';
 
 export default function Sidebar({ 
   sessions, 
@@ -11,11 +12,40 @@ export default function Sidebar({
   onDeleteSession,
   onShowPreferences,
   onShowProjects,
-  onRefreshSessions
+  onRefreshSessions,
+  smartTopics = [],
+  currentTopicId = null
 }) {
   const [hoveredSession, setHoveredSession] = useState(null);
   const [editingId, setEditingId] = useState(null);
   const [editTitle, setEditTitle] = useState('');
+  const [viewMode, setViewMode] = useState('cloud');
+
+  // Check if we're in smart mode (have topics to display)
+  const isSmartMode = smartTopics && smartTopics.length > 0;
+
+  // Handle topic selection - fetch snapshot and open as virtual thread
+  const handleTopicSelect = async (topic) => {
+    if (!topic.topicId) return;
+    
+    try {
+      // Fetch the full snapshot for this topic
+      const response = await fetch(`/api/topics/${encodeURIComponent(topic.topicId)}/snapshot?limit=200`);
+      if (!response.ok) {
+        console.error('Failed to fetch topic snapshot');
+        return;
+      }
+      
+      const snapshot = await response.json();
+      
+      // Dispatch virtual thread event
+      window.dispatchEvent(new CustomEvent('open-virtual-thread', {
+        detail: { topic, snapshot }
+      }));
+    } catch (error) {
+      console.error('Error opening virtual thread:', error);
+    }
+  };
 
   const startEdit = (session, e) => {
     e.stopPropagation();
@@ -59,30 +89,69 @@ export default function Sidebar({
   };
 
   return (
-    <div className="w-80 bg-white/80 backdrop-blur-sm border-r border-gray-200 flex flex-col">
+    <div className="w-1/3 bg-white/80 backdrop-blur-sm border-r border-gray-200 flex flex-col">
       {/* Header */}
       <div className="p-4 border-b border-gray-200">
         <h1 className="text-2xl font-bold text-mint-700 mb-4">
           🧠 ScottBot Local
         </h1>
         
-        <button
-          onClick={onNewChat}
-          className="w-full flex items-center justify-center gap-2 bg-mint-500 hover:bg-mint-600 text-white px-4 py-3 rounded-lg transition-colors font-medium"
-        >
-          <MessageSquarePlus size={20} />
-          New Chat
-        </button>
+        <div className="space-y-2">
+          <button
+            onClick={onNewChat}
+            className="w-full flex items-center justify-center gap-2 bg-mint-500 hover:bg-mint-600 text-white px-4 py-3 rounded-lg transition-colors font-medium"
+            title="Clear the screen for a fresh view - your topics and history are preserved"
+          >
+            <MessageSquarePlus size={20} />
+            Clear Screen
+          </button>
+
+          {/* Cloud/List Toggle - only show if we have topics */}
+          {isSmartMode && (
+            <div className="flex gap-1 bg-gray-100 p-1 rounded-lg">
+              <button
+                onClick={() => setViewMode('cloud')}
+                className={`flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded transition-colors ${
+                  viewMode === 'cloud'
+                    ? 'bg-white text-mint-600 shadow-sm'
+                    : 'text-gray-600 hover:text-gray-800'
+                }`}
+              >
+                <Cloud size={16} />
+                <span className="text-sm font-medium">Cloud</span>
+              </button>
+              <button
+                onClick={() => setViewMode('list')}
+                className={`flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded transition-colors ${
+                  viewMode === 'list'
+                    ? 'bg-white text-mint-600 shadow-sm'
+                    : 'text-gray-600 hover:text-gray-800'
+                }`}
+              >
+                <List size={16} />
+                <span className="text-sm font-medium">List</span>
+              </button>
+            </div>
+          )}
+        </div>
       </div>
 
-      {/* Sessions List */}
+      {/* Sessions List or Topic Cloud */}
       <div className="flex-1 overflow-y-auto p-2">
-        {sessions.length === 0 ? (
-          <div className="text-center text-gray-400 mt-8">
-            No chats yet. Start a new one!
-          </div>
+        {isSmartMode && viewMode === 'cloud' ? (
+          <TopicCloud
+            topics={smartTopics}
+            currentTopicId={currentTopicId}
+            onSelectTopic={handleTopicSelect}
+          />
         ) : (
-          sessions.map(session => (
+          <>
+            {sessions.length === 0 ? (
+              <div className="text-center text-gray-400 mt-8">
+                No chats yet. Start a new one!
+              </div>
+            ) : (
+              sessions.map(session => (
             <div
               key={session.id}
               onMouseEnter={() => setHoveredSession(session.id)}
@@ -168,6 +237,8 @@ export default function Sidebar({
               </div>
             </div>
           ))
+        )}
+          </>
         )}
       </div>
 

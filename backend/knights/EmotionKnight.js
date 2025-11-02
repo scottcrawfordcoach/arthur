@@ -11,6 +11,12 @@
 
 import KnightBase from './KnightBase.js';
 import OpenAI from 'openai';
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 class EmotionKnight extends KnightBase {
   constructor(config = {}) {
@@ -21,29 +27,9 @@ class EmotionKnight extends KnightBase {
       apiKey: process.env.OPENAI_API_KEY
     });
     
-    // Quick pattern matching for urgent/crisis detection
-    this.urgentPatterns = [
-      /\b(help|urgent|emergency|crisis|desperate|can't take|suicide|hurt myself)\b/i,
-      /!{2,}/, // Multiple exclamation marks
-      /\?\?+/, // Multiple question marks
-    ];
-    
-    this.riskPatterns = [
-      /\b(suicide|kill myself|end it all|not worth living|hurt myself|self harm)\b/i,
-      /\b(can't go on|no point|give up|done with)\b/i,
-    ];
-    
-    this.negativeWords = [
-      'terrible', 'awful', 'horrible', 'frustrated', 'angry', 'sad', 
-      'depressed', 'anxious', 'stressed', 'worried', 'scared', 'stuck',
-      'failing', 'hopeless', 'exhausted', 'overwhelmed', 'breaking'
-    ];
-    
-    this.positiveWords = [
-      'great', 'amazing', 'excellent', 'happy', 'excited', 'motivated',
-      'energized', 'confident', 'grateful', 'optimistic', 'hopeful',
-      'proud', 'accomplished', 'successful', 'thrilled', 'fantastic'
-    ];
+    // Load policy
+    const policyPath = path.join(__dirname, '../config/emotion_knight_policy.json');
+    this.policy = JSON.parse(fs.readFileSync(policyPath, 'utf8'));
   }
 
   /**
@@ -55,9 +41,16 @@ class EmotionKnight extends KnightBase {
    */
   quickAnalysis(userMessage) {
     const messageLower = userMessage.toLowerCase();
+    const policy = this.policy;
+    
+    // Build regex patterns from policy keywords with safe defaults
+    const riskKeywords = (policy?.crisis_patterns?.risk_keywords || []).join('|') || 'suicide|kill myself';
+    const urgentKeywords = (policy?.crisis_patterns?.urgent_keywords || []).join('|') || 'help|urgent|emergency';
+    const riskPattern = new RegExp(`\\b(${riskKeywords})\\b`, 'i');
+    const urgentPattern = new RegExp(`\\b(${urgentKeywords})\\b`, 'i');
     
     // Check for crisis/risk indicators
-    const hasRiskPattern = this.riskPatterns.some(pattern => pattern.test(userMessage));
+    const hasRiskPattern = riskPattern.test(userMessage);
     if (hasRiskPattern) {
       return this.createResult(
         {
@@ -68,25 +61,44 @@ class EmotionKnight extends KnightBase {
           tone_indicators: ['crisis_keywords', 'risk_detected'],
           energy_level: 'low'
         },
-        0.95, // High confidence in crisis detection
+        policy.confidence_thresholds.crisis_detection,
         'Crisis/risk keywords detected via pattern matching'
       );
     }
     
     // Check for urgency
-    const hasUrgentPattern = this.urgentPatterns.some(pattern => pattern.test(userMessage));
-    const urgency = hasUrgentPattern ? 0.8 : 0.3;
+    const hasUrgentPattern = urgentPattern.test(userMessage) || /!{2,}/.test(userMessage) || /\?\?+/.test(userMessage);
+    const urgency = hasUrgentPattern ? (policy?.crisis_patterns?.thresholds?.urgent || 0.8) : 0.3;
     
-    // Simple sentiment analysis based on word counts
-    const negativeCount = this.negativeWords.filter(word => 
+    // Simple sentiment analysis based on word counts from policy
+    const negativeWords = policy?.sentiment_words?.negative || [];
+    const positiveWords = policy?.sentiment_words?.positive || [];
+    
+    const negativeCount = negativeWords.filter(word => 
       messageLower.includes(word)
     ).length;
-    const positiveCount = this.positiveWords.filter(word => 
+    const positiveCount = positiveWords.filter(word => 
       messageLower.includes(word)
     ).length;
     
     const sentiment = positiveCount - negativeCount;
     const normalizedSentiment = Math.max(-1, Math.min(1, sentiment / 5));
+    
+    // Detect mood from policy patterns
+    let detectedMood = 'neutral';
+    let highestMoodCount = 0;
+    
+    const moodDetection = policy?.mood_detection || {};
+    for (const [moodName, moodData] of Object.entries(moodDetection)) {
+      const moodKeywords = moodData?.keywords || [];
+      const moodCount = moodKeywords.filter(word => 
+        messageLower.includes(word)
+      ).length;
+      if (moodCount > highestMoodCount) {
+        highestMoodCount = moodCount;
+        detectedMood = moodName;
+      }
+    }
     
     // Detect energy level from message length and punctuation
     const wordCount = userMessage.split(/\s+/).length;
@@ -94,18 +106,30 @@ class EmotionKnight extends KnightBase {
     const shortSentences = userMessage.split(/[.!?]/).filter(s => s.trim()).length > 3;
     
     let energy_level = 'medium';
+    const lowIndicators = policy?.energy_level_indicators?.low || [];
+    const highIndicators = policy?.energy_level_indicators?.high || [];
+    
     if (wordCount < 10 && !hasExclamation) {
       energy_level = 'low';
     } else if (hasExclamation && (wordCount > 30 || shortSentences)) {
       energy_level = 'high';
     }
     
-    // Determine mood from sentiment
-    let mood = 'neutral';
-    if (normalizedSentiment > 0.3) mood = 'happy';
-    else if (normalizedSentiment > 0.6) mood = 'excited';
-    else if (normalizedSentiment < -0.3) mood = 'frustrated';
-    else if (normalizedSentiment < -0.6) mood = 'sad';
+    // Check energy indicators from policy
+    if (lowIndicators.some(ind => messageLower.includes(ind))) {
+      energy_level = 'low';
+    } else if (highIndicators.some(ind => messageLower.includes(ind))) {
+      energy_level = 'high';
+    }
+    
+    // Use detected mood from policy patterns or fallback to sentiment-based
+    let mood = detectedMood;
+    if (mood === 'neutral') {
+      if (normalizedSentiment > 0.6) mood = 'excited';
+      else if (normalizedSentiment > 0.3) mood = 'happy';
+      else if (normalizedSentiment < -0.6) mood = 'sad';
+      else if (normalizedSentiment < -0.3) mood = 'frustrated';
+    }
     
     const tone_indicators = [];
     if (hasExclamation) tone_indicators.push('exclamation');
@@ -122,8 +146,8 @@ class EmotionKnight extends KnightBase {
         tone_indicators,
         energy_level
       },
-      0.6, // Moderate confidence for pattern matching
-      'Quick pattern-based emotion analysis'
+      policy.confidence_thresholds.pattern_match || 0.7,
+      'Quick pattern-based emotion analysis using policy rules'
     );
   }
 

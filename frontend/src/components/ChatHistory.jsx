@@ -101,9 +101,10 @@ export default function ChatHistory({ currentSessionId, onSelectSession, onNewCh
         <button
           onClick={onNewChat}
           className="w-full px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors flex items-center justify-center gap-2"
+          title="Clear the screen for a fresh view - your topics and history are preserved"
         >
           <MessageSquare size={18} />
-          New Chat
+          Clear Screen
         </button>
       </div>
 

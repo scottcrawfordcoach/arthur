@@ -1,0 +1,66 @@
+{
+  "description": "Needs Knight policy - governs intent detection and support needs classification",
+  "version": "1.0.0",
+  
+  "intent_patterns": {
+    "description": "Patterns for detecting user intent types",
+    "information": {
+      "keywords": ["what", "how", "why", "when", "where", "who", "explain", "tell me", "show me"],
+      "description": "User seeking factual information or explanations"
+    },
+    "validation": {
+      "keywords": ["right", "correct", "good", "okay", "should I", "is this", "am I"],
+      "description": "User seeking confirmation or approval"
+    },
+    "guidance": {
+      "keywords": ["help", "stuck", "don't know", "unsure", "confused", "lost"],
+      "description": "User needs direction or guidance"
+    },
+    "emotional_support": {
+      "keywords": ["feel", "feeling", "frustrated", "scared", "worried", "anxious", "upset"],
+      "description": "User needs emotional validation or support"
+    },
+    "problem_solving": {
+      "keywords": ["fix", "solve", "work", "broken", "error", "issue", "problem"],
+      "description": "User needs help solving a specific problem"
+    },
+    "exploration": {
+      "keywords": ["think", "consider", "maybe", "wondering", "curious", "interested"],
+      "description": "User exploring ideas or options"
+    },
+    "goal_setting": {
+      "keywords": ["want to", "need to", "trying to", "working on", "goal", "plan"],
+      "description": "User setting or working toward goals"
+    }
+  },
+  
+  "support_types": {
+    "description": "Types of support that can be provided",
+    "available": [
+      "emotional_support",
+      "information",
+      "guidance",
+      "validation",
+      "problem_solving",
+      "encouragement"
+    ]
+  },
+  
+  "learning_intent_indicators": {
+    "high": ["explain", "understand", "learn", "teach me", "how does", "why does"],
+    "medium": ["what is", "tell me about", "curious", "interested in"],
+    "low": ["fix", "solve", "just need", "quickly", "fast"]
+  },
+  
+  "goal_alignment_indicators": {
+    "aligned": ["working on", "making progress", "following through", "committed"],
+    "exploring": ["thinking about", "considering", "maybe", "wondering"],
+    "blocked": ["stuck", "can't", "not working", "failing", "struggling"]
+  },
+  
+  "confidence_thresholds": {
+    "pattern_match": 0.65,
+    "llm_analysis": 0.85,
+    "high_confidence_need": 0.8
+  }
+}

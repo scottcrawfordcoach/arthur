@@ -14,27 +14,63 @@ function App() {
   const [showPreferences, setShowPreferences] = useState(false);
   const [showProjects, setShowProjects] = useState(false);
   const [preferences, setPreferences] = useState({});
+  const [personalContext, setPersonalContext] = useState({});
+  const [userMemory, setUserMemory] = useState({});
   const [projectBuckets, setProjectBuckets] = useState([]);
   const [activeProjectBucket, setActiveProjectBucket] = useState(null);
   const [showTimeline, setShowTimeline] = useState(false);
   const [showHistoryExplorer, setShowHistoryExplorer] = useState(false);
+  const [smartTopics, setSmartTopics] = useState([]);
+  const [currentTopicContext, setCurrentTopicContext] = useState(null);
+  const [virtualThread, setVirtualThread] = useState(null); // { topic, messages, topicId }
+  const [notification, setNotification] = useState(null); // { message, type }
 
   // Load sessions on mount
   useEffect(() => {
     fetchSessions();
-    fetchPreferences();
+  fetchPreferences();
+  fetchPersonalContext();
+  fetchUserMemory();
     fetchProjectBucketsData();
+    fetchSmartTopics();
+    
     // Listen for global open-session events (from UnifiedTimeline snapshot drill-down)
     const onOpenSession = (e) => {
       const sessionId = e?.detail?.sessionId;
       if (sessionId) {
         setCurrentSessionId(sessionId);
+        setCurrentTopicContext(null);
+        setVirtualThread(null); // Clear virtual thread when opening a session
         fetchSessions();
         fetchProjectBucketsData(sessionId);
+        fetchSmartTopics();
       }
     };
+    
+    // Listen for open-virtual-thread events (from topic cloud clicks)
+    const onOpenVirtualThread = (e) => {
+      const { topic, snapshot } = e?.detail || {};
+      if (topic && snapshot?.items) {
+        setVirtualThread({
+          topic: topic.topic,
+          topicId: topic.topicId,
+          messages: snapshot.items,
+          sessionId: topic.sessionId, // Representative session for bucket/context
+          lastActive: topic.lastActive,
+          count: topic.count
+        });
+        setCurrentSessionId(null); // Clear regular session
+        setCurrentTopicContext(topic);
+        // Don't fetch sessions - we're in virtual thread mode
+      }
+    };
+    
     window.addEventListener('open-session', onOpenSession);
-    return () => window.removeEventListener('open-session', onOpenSession);
+    window.addEventListener('open-virtual-thread', onOpenVirtualThread);
+    return () => {
+      window.removeEventListener('open-session', onOpenSession);
+      window.removeEventListener('open-virtual-thread', onOpenVirtualThread);
+    };
   }, []);
 
   useEffect(() => {
@@ -45,16 +81,28 @@ function App() {
 
   const fetchSessions = async () => {
     try {
-      const response = await fetch('/api/sessions');
+      const response = await fetch('/api/sessions?limit=30');
       const data = await response.json();
       setSessions(data.sessions || []);
       
       // Select most recent session if none selected
       if (!currentSessionId && data.sessions?.length > 0) {
         setCurrentSessionId(data.sessions[0].id);
+        setCurrentTopicContext(null);
       }
     } catch (error) {
       console.error('Failed to fetch sessions:', error);
+    }
+  };
+
+  const fetchSmartTopics = async () => {
+    try {
+      const response = await fetch('/api/topics/summary?limit=10');
+      const data = await response.json();
+      const items = Array.isArray(data) ? data : data.items;
+      setSmartTopics(items || []);
+    } catch (error) {
+      console.error('Failed to fetch smart topics:', error);
     }
   };
 
@@ -65,6 +113,26 @@ function App() {
       setPreferences(data.preferences || {});
     } catch (error) {
       console.error('Failed to fetch preferences:', error);
+    }
+  };
+
+  const fetchPersonalContext = async () => {
+    try {
+      const res = await fetch('/api/preferences/personal-context');
+      const data = await res.json();
+      setPersonalContext(data.personalContext || {});
+    } catch (error) {
+      console.error('Failed to fetch personal context:', error);
+    }
+  };
+
+  const fetchUserMemory = async () => {
+    try {
+      const res = await fetch('/api/preferences/memory');
+      const data = await res.json();
+      setUserMemory(data.memory || {});
+    } catch (error) {
+      console.error('Failed to fetch user memory:', error);
     }
   };
 
@@ -87,10 +155,23 @@ function App() {
 
   const handleNewChat = () => {
     setCurrentSessionId(null); // Will create new session on first message
+    setCurrentTopicContext(null);
+    setVirtualThread(null); // Clear virtual thread
+    
+    // Show reassuring notification
+    setNotification({
+      message: '✓ Topics saved to cloud • Messages embedded & searchable • History preserved',
+      type: 'success'
+    });
+    
+    // Auto-dismiss after 4 seconds
+    setTimeout(() => setNotification(null), 4000);
   };
 
-  const handleSelectSession = (sessionId) => {
+  const handleSelectSession = (sessionId, topicContext = null) => {
     setCurrentSessionId(sessionId);
+    setCurrentTopicContext(topicContext);
+    setVirtualThread(null); // Clear virtual thread when switching to regular session
   };
 
   const handleDeleteSession = async (sessionId) => {
@@ -100,7 +181,9 @@ function App() {
       
       if (currentSessionId === sessionId) {
         setCurrentSessionId(null);
+        setCurrentTopicContext(null);
       }
+      fetchSmartTopics();
     } catch (error) {
       console.error('Failed to delete session:', error);
     }
@@ -117,6 +200,42 @@ function App() {
       setPreferences({ ...preferences, [key]: value });
     } catch (error) {
       console.error('Failed to update preference:', error);
+    }
+  };
+
+  const handleUpdatePersonalContext = async (type, content, extra = {}) => {
+    try {
+      const res = await fetch(`/api/preferences/personal-context/${encodeURIComponent(type)}` ,{
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ content, ...extra })
+      });
+      if (!res.ok) throw new Error('Failed to update personal context');
+      setPersonalContext({
+        ...personalContext,
+        [type]: { ...(personalContext[type] || {}), content, ...extra, updatedAt: new Date().toISOString() }
+      });
+    } catch (error) {
+      console.error('Failed to update personal context:', error);
+      throw error;
+    }
+  };
+
+  const handleUpdateMemory = async (key, value, extra = {}) => {
+    try {
+      const res = await fetch(`/api/preferences/memory/${encodeURIComponent(key)}` ,{
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ value, ...extra })
+      });
+      if (!res.ok) throw new Error('Failed to update memory');
+      setUserMemory({
+        ...userMemory,
+        [key]: { ...(userMemory[key] || {}), value, ...extra, updatedAt: new Date().toISOString() }
+      });
+    } catch (error) {
+      console.error('Failed to update user memory:', error);
+      throw error;
     }
   };
 
@@ -225,10 +344,23 @@ function App() {
 
   return (
     <div className="flex h-screen overflow-hidden">
+      {/* Notification Toast */}
+      {notification && (
+        <div className="fixed top-4 left-1/2 transform -translate-x-1/2 z-50 animate-fade-in">
+          <div className={`px-6 py-3 rounded-lg shadow-lg ${
+            notification.type === 'success' ? 'bg-mint-500 text-white' : 'bg-gray-800 text-white'
+          }`}>
+            {notification.message}
+          </div>
+        </div>
+      )}
+      
       {/* Sidebar */}
       <Sidebar
         sessions={sessions}
+        smartTopics={smartTopics}
         currentSessionId={currentSessionId}
+        currentTopicId={currentTopicContext?.topicId || null}
         onNewChat={handleNewChat}
         onSelectSession={handleSelectSession}
         onDeleteSession={handleDeleteSession}
@@ -240,7 +372,10 @@ function App() {
           setShowPreferences(false);
           setShowProjects(true);
         }}
-        onRefreshSessions={fetchSessions}
+        onRefreshSessions={() => {
+          fetchSessions();
+          fetchSmartTopics();
+        }}
       />
 
       {/* Main Chat Area */}
@@ -271,9 +406,14 @@ function App() {
 
         <ChatWindow
           sessionId={currentSessionId}
+          topicContext={currentTopicContext}
+          virtualThread={virtualThread}
           onSessionCreated={(id) => {
             setCurrentSessionId(id);
+            setCurrentTopicContext(null);
+            setVirtualThread(null); // Clear virtual thread when new session created
             fetchSessions();
+            fetchSmartTopics();
           }}
         />
       </div>
@@ -305,7 +445,12 @@ function App() {
       {showPreferences && (
         <PreferencesPane
           preferences={preferences}
+          personalContext={personalContext}
+          memory={userMemory}
           onUpdate={handleUpdatePreference}
+          onUpdatePersonalContext={handleUpdatePersonalContext}
+          onUpdateMemory={handleUpdateMemory}
+          onRefresh={() => { fetchPreferences(); fetchPersonalContext(); fetchUserMemory(); }}
           onClose={() => setShowPreferences(false)}
         />
       )}

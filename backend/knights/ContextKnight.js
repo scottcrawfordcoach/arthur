@@ -27,11 +27,21 @@
 
 import KnightBase from './KnightBase.js';
 import OpenAI from 'openai';
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 class ContextKnight extends KnightBase {
   constructor() {
     super('context');
     this.openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+    
+    // Load policy
+    const policyPath = path.join(__dirname, '../config/context_knight_policy.json');
+    this.policy = JSON.parse(fs.readFileSync(policyPath, 'utf8'));
   }
 
   /**
@@ -61,13 +71,14 @@ class ContextKnight extends KnightBase {
   }
 
   /**
-   * Quick pattern-based context analysis
+   * Quick pattern-based context analysis using policy rules
    * @param {string} userMessage - Current message
    * @param {Object} signals - Other Knight signals
    * @returns {Object} Basic context signals
    */
   quickAnalysis(userMessage, signals) {
     const { emotion, needs, pattern } = signals;
+    const rules = this.policy.context_rules;
     
     const context_requests = {
       semantic_search: [],
@@ -77,99 +88,66 @@ class ContextKnight extends KnightBase {
     
     const context_priority = [];
     
-    // Helper: Calculate 3D scoring weights based on signals
-    const calculateScoring = (context) => {
-      let semantic = 0.4;
-      let recency = 0.25;
-      let frequency = 0.20;
-      let vehemence = 0.15;
-      
-      // High urgency/crisis → prioritize recent
-      if (context === 'crisis' && emotion?.urgency > 0.7) {
-        semantic = 0.3;
-        recency = 0.35;
-        frequency = 0.2;
-        vehemence = 0.15;
-      }
-      // Recurring topic → prioritize frequency
-      else if (context === 'recurring' && pattern?.recurring_topics?.length > 0) {
-        semantic = 0.35;
-        recency = 0.2;
-        frequency = 0.3;
-        vehemence = 0.15;
-      }
-      // Learning/factual → prioritize semantic
-      else if (context === 'learning' && needs?.learning_intent > 0.6) {
-        semantic = 0.5;
-        recency = 0.2;
-        frequency = 0.15;
-        vehemence = 0.15;
-      }
-      // High emotion → prioritize vehemence
-      else if (context === 'emotional' && (emotion?.risk > 0.6 || Math.abs(emotion?.sentiment || 0) > 0.6)) {
-        semantic = 0.3;
-        recency = 0.3;
-        frequency = 0.2;
-        vehemence = 0.2;
-      }
-      
-      return { semantic_weight: semantic, recency_weight: recency, frequency_weight: frequency, vehemence_weight: vehemence };
-    };
-    
-    // If high urgency or risk, prioritize recent conversations
+    // Check crisis/high urgency (highest priority)
     if (emotion?.urgency > 0.7 || emotion?.risk > 0.5) {
+      const rule = rules.crisis_or_high_urgency;
       context_requests.semantic_search.push({
         query: userMessage,
-        tier: 'personal_journal',
-        limit: 12,
-        time_range: 'all',
-        scoring: calculateScoring('crisis')
+        tier: rule.tiers[0],
+        limit: rule.limit,
+        time_range: rule.time_range,
+        scoring: rule.scoring
       });
       context_requests.conversation_history = {
-        lookback: '24 hours',
+        lookback: rule.conversation_lookback,
         limit: 10
       };
-      context_priority.push('conversation_history', 'semantic_search');
+      context_priority.push(...rule.priority);
     }
     
-    // If learning intent, search reference library
+    // Check learning intent
     if (needs?.learning_intent > 0.6) {
+      const rule = rules.learning_intent;
       context_requests.semantic_search.push({
         query: userMessage,
-        tier: 'reference_library',
-        limit: 15,
-        time_range: 'all',
-        scoring: calculateScoring('learning')
+        tier: rule.tiers[0],
+        limit: rule.limit,
+        time_range: rule.time_range,
+        scoring: rule.scoring
       });
       if (!context_priority.includes('semantic_search')) {
         context_priority.push('semantic_search');
       }
     }
     
-    // If emotional support needed
+    // Check emotional support
     if (needs?.support_needed && needs.support_needed.includes('emotional')) {
+      const rule = rules.emotional_support;
       context_requests.semantic_search.push({
-        query: 'emotional support strategies that worked before',
-        tier: 'personal_journal',
-        limit: 8,
-        time_range: 'all',
-        scoring: calculateScoring('emotional')
+        query: rule.query,
+        tier: rule.tiers[0],
+        limit: rule.limit,
+        time_range: rule.time_range,
+        scoring: rule.scoring
       });
-      context_requests.user_data.push('coping_strategies');
+      if (rule.request_user_data) {
+        context_requests.user_data.push(...rule.request_user_data);
+      }
       if (!context_priority.includes('semantic_search')) {
         context_priority.push('semantic_search');
       }
     }
     
-    // If recurring topics detected, search ALL TIME with frequency weighting
+    // Check recurring topics
     if (pattern?.recurring_topics && pattern.recurring_topics.length > 0) {
+      const rule = rules.recurring_topics;
       pattern.recurring_topics.forEach(topic => {
         context_requests.semantic_search.push({
           query: topic,
-          tier: 'personal_journal',
-          limit: 10,
-          time_range: 'all',
-          scoring: calculateScoring('recurring')
+          tier: rule.tiers[0],
+          limit: rule.limit,
+          time_range: rule.time_range,
+          scoring: rule.scoring
         });
       });
       if (!context_priority.includes('semantic_search')) {
@@ -177,20 +155,30 @@ class ContextKnight extends KnightBase {
       }
     }
     
-    // Default: search personal journal for relevant context
+    // Default: search all sources
     if (context_requests.semantic_search.length === 0) {
+      const rule = rules.default;
       context_requests.semantic_search.push({
         query: userMessage,
-        tier: 'personal_journal',
-        limit: 10,
-        time_range: 'all',
-        scoring: { semantic_weight: 0.4, recency_weight: 0.25, frequency_weight: 0.2, vehemence_weight: 0.15 }
+        tier: rule.tiers[0],
+        limit: rule.limit,
+        time_range: rule.time_range,
+        scoring: rule.scoring
       });
       context_priority.push('semantic_search');
     }
     
-    // Novelty: is this a completely new topic?
-    const novelty = pattern?.recurring_topics?.length > 0 ? 0.3 : 0.8;
+    // Enforce limits from policy
+    const limits = this.policy.limits;
+    if (context_requests.semantic_search.length > limits.max_semantic_searches_per_request) {
+      context_requests.semantic_search = context_requests.semantic_search.slice(0, limits.max_semantic_searches_per_request);
+    }
+    
+    // Calculate novelty based on policy thresholds
+    const noveltyThresholds = this.policy.novelty_threshold;
+    const novelty = pattern?.recurring_topics?.length > 0 
+      ? noveltyThresholds.recurring_topic_present 
+      : noveltyThresholds.no_recurring_topics;
     
     return {
       context_requests,

@@ -58,6 +58,7 @@
   },
   "coach": {
     "description": "Supportive, motivational responses with empathy and encouragement",
+    "instruction": "Follow ICF Core Competencies: Focus on evoking awareness through curious inquiry rather than demonstrating expertise. Ask ONE powerful, open-ended question that helps the client explore their own thinking. Avoid yes/no questions except for explicit clarification. Avoid stacking multiple questions. The goal is to establish HOW to help through curiosity, not to show HOW HELPFUL you can be. Be fully present, acknowledge emotions/progress briefly, then invite deeper exploration with a single thoughtful question.",
     "boosters": [
       {
         "name": "high_urgency",

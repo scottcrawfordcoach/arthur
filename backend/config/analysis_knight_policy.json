@@ -1,0 +1,183 @@
+{
+  "description": "Analysis Knight policy - governs signal synthesis and Herald invocation decisions",
+  "version": "1.0.0",
+  
+  "herald_invocation": {
+    "description": "Rules for when to invoke Herald (web search)",
+    
+    "internal_first_patterns": {
+      "description": "Patterns indicating user wants internal sources only",
+      "keywords": [
+        "without using web search",
+        "without using a web search",
+        "no web search",
+        "no web",
+        "local only",
+        "internal only",
+        "from your files",
+        "from my files",
+        "from your library",
+        "from my library",
+        "from your reference library",
+        "from the reference library"
+      ]
+    },
+    
+    "library_intent_patterns": {
+      "description": "Patterns indicating user wants reference library content",
+      "keywords": [
+        "reference library",
+        "your library",
+        "books in your library",
+        "books in the library",
+        "book list",
+        "list of books"
+      ]
+    },
+    
+    "invoke_conditions": {
+      "description": "Conditions that trigger Herald invocation",
+      
+      "high_learning_novel_topic": {
+        "condition": "learning_intent > threshold AND novelty > threshold",
+        "learning_intent_threshold": 0.7,
+        "novelty_threshold": 0.7,
+        "priority": "primary",
+        "reason": "New learning topic with no historical context"
+      },
+      
+      "direct_question_novel": {
+        "condition": "Message matches question pattern AND novelty > threshold",
+        "question_patterns": ["^what", "^how", "^why", "^when", "^where", "^who", "^can you explain", "^tell me about"],
+        "novelty_threshold": 0.6,
+        "priority": "fallback",
+        "reason": "Direct question about potentially unfamiliar topic"
+      },
+      
+      "explicit_web_request": {
+        "condition": "User explicitly asks for web search",
+        "patterns": ["search the web", "look online", "find on internet", "google", "search for"],
+        "priority": "primary",
+        "reason": "User explicitly requested web search"
+      }
+    }
+  },
+  
+  "ambiguity_detection": {
+    "description": "Rules for detecting contradictory signals",
+    
+    "contradictions": [
+      {
+        "name": "urgency_vs_learning",
+        "condition": "urgency > 0.7 AND learning_intent > 0.7",
+        "message": "High urgency conflicts with deep learning intent"
+      },
+      {
+        "name": "negative_emotion_vs_exploration",
+        "condition": "sentiment < -0.5 AND exploratory > 0.7",
+        "message": "Negative emotion conflicts with exploratory intent"
+      },
+      {
+        "name": "crisis_vs_casual",
+        "condition": "risk > 0.8 AND urgency < 0.3",
+        "message": "High risk detected but low urgency signal"
+      }
+    ]
+  },
+  
+  "knowledge_gaps": {
+    "description": "Rules for identifying missing information",
+    
+    "gap_conditions": [
+      {
+        "name": "no_historical_context",
+        "condition": "novelty > 0.7 AND no_recurring_topics",
+        "message": "No historical context for this topic"
+      },
+      {
+        "name": "risk_without_coping_data",
+        "condition": "risk > 0.6 AND no_user_data_requested",
+        "message": "High risk but no user coping strategies retrieved"
+      },
+      {
+        "name": "learning_without_resources",
+        "condition": "learning_intent > 0.7 AND no_reference_library_search",
+        "message": "Learning intent but no reference materials requested"
+      }
+    ]
+  },
+  
+  "confidence_calculation": {
+    "description": "How to calculate overall confidence in signal interpretation",
+    
+    "base_confidence": 0.7,
+    
+    "adjustments": {
+      "high_emotion_signals": {
+        "condition": "emotion signals present with urgency > 0.5 OR risk > 0.5",
+        "adjustment": 0.1,
+        "reason": "Strong emotion signals increase confidence"
+      },
+      "ambiguity_detected": {
+        "condition": "ambiguity_detected.length > 0",
+        "adjustment": -0.15,
+        "reason": "Contradictory signals reduce confidence"
+      },
+      "no_pattern_data": {
+        "condition": "no conversation history available",
+        "adjustment": -0.1,
+        "reason": "Limited historical context reduces confidence"
+      },
+      "all_knights_agree": {
+        "condition": "emotion, needs, pattern all provide consistent signals",
+        "adjustment": 0.15,
+        "reason": "Signal consensus increases confidence"
+      }
+    },
+    
+    "min_confidence": 0.3,
+    "max_confidence": 0.95
+  },
+  
+  "recommendation_rules": {
+    "description": "Primary action recommendations based on signals",
+    
+    "priorities": [
+      {
+        "action": "provide_crisis_support",
+        "condition": "emotion.risk > 0.7 OR emotion.urgency > 0.8",
+        "priority": 1
+      },
+      {
+        "action": "invoke_herald",
+        "condition": "herald_recommendation.invoke === true AND priority === 'primary'",
+        "priority": 2
+      },
+      {
+        "action": "provide_emotional_support",
+        "condition": "support_needed includes 'emotional_support' AND sentiment < -0.4",
+        "priority": 3
+      },
+      {
+        "action": "answer_from_context",
+        "condition": "sufficient internal context available",
+        "priority": 4
+      },
+      {
+        "action": "explore_with_user",
+        "condition": "exploratory > 0.6 OR ambiguity_detected.length > 0",
+        "priority": 5
+      }
+    ]
+  },
+  
+  "thresholds": {
+    "high_urgency": 0.7,
+    "high_risk": 0.6,
+    "high_learning_intent": 0.7,
+    "high_novelty": 0.7,
+    "medium_novelty": 0.6,
+    "negative_sentiment": -0.4,
+    "high_exploratory": 0.6
+  }
+}

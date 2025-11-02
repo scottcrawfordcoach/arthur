@@ -1,0 +1,92 @@
+{
+  "description": "Pattern Knight policy - governs topic and behavioral pattern detection",
+  "version": "1.0.0",
+  
+  "topic_patterns": {
+    "description": "Common topic categories and their keyword patterns",
+    "authentication": {
+      "keywords": ["auth", "login", "password", "token", "session", "jwt", "oauth"],
+      "category": "security"
+    },
+    "database": {
+      "keywords": ["database", "sql", "query", "schema", "table", "migration", "postgres", "sqlite"],
+      "category": "data"
+    },
+    "frontend": {
+      "keywords": ["react", "component", "ui", "css", "html", "frontend", "dom", "render"],
+      "category": "development"
+    },
+    "backend": {
+      "keywords": ["server", "api", "endpoint", "route", "express", "node", "backend"],
+      "category": "development"
+    },
+    "deployment": {
+      "keywords": ["deploy", "production", "docker", "container", "aws", "cloud", "hosting"],
+      "category": "operations"
+    },
+    "testing": {
+      "keywords": ["test", "testing", "jest", "unit", "integration", "coverage"],
+      "category": "quality"
+    },
+    "performance": {
+      "keywords": ["slow", "performance", "optimize", "cache", "speed", "latency"],
+      "category": "optimization"
+    },
+    "debugging": {
+      "keywords": ["bug", "error", "debug", "issue", "problem", "broken", "fix"],
+      "category": "troubleshooting"
+    },
+    "architecture": {
+      "keywords": ["architecture", "design", "pattern", "structure", "organize"],
+      "category": "planning"
+    },
+    "learning": {
+      "keywords": ["learn", "understand", "tutorial", "how to", "explain", "teach"],
+      "category": "education"
+    }
+  },
+  
+  "rhythm_detection": {
+    "description": "Patterns for detecting conversation rhythm",
+    "daily": {
+      "description": "Messages consistently spread across multiple days",
+      "min_days": 3,
+      "messages_per_day": 2
+    },
+    "sporadic": {
+      "description": "Irregular gaps between conversations",
+      "max_gap_hours": 168,
+      "min_gap_hours": 48
+    },
+    "intensive": {
+      "description": "Bursts of many messages in short timeframe",
+      "min_messages": 5,
+      "timeframe_hours": 2
+    },
+    "single_session": {
+      "description": "One conversation session only",
+      "max_messages": 10,
+      "max_duration_hours": 1
+    }
+  },
+  
+  "recurring_topic_threshold": {
+    "description": "Minimum occurrences to consider a topic recurring",
+    "min_occurrences": 2,
+    "timeframe_days": 30
+  },
+  
+  "behavioral_trends": {
+    "description": "Types of behavioral patterns to detect",
+    "learning_style": ["visual", "hands-on", "conceptual", "step-by-step"],
+    "problem_solving": ["analytical", "experimental", "research-first", "trial-and-error"],
+    "communication": ["detailed", "concise", "questioning", "declarative"]
+  },
+  
+  "confidence_thresholds": {
+    "pattern_strength_high": 0.8,
+    "pattern_strength_medium": 0.5,
+    "pattern_strength_low": 0.3,
+    "no_history": 0.3
+  }
+}
