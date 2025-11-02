@@ -11,6 +11,7 @@ const __dirname = dirname(__filename);
 dotenv.config({ path: join(__dirname, '../.env') });
 
 import express from 'express';
+import os from 'os';
 import cors from 'cors';
 import logger from './utils/logger.js';
 import { initDatabase } from './services/db.js';
@@ -32,9 +33,36 @@ import projectBucketsRoutes from './routes/projectBuckets.js';
 const app = express();
 const PORT = process.env.PORT || 3001;
 
+function getLanIP() {
+  try {
+    const nets = os.networkInterfaces();
+    for (const name of Object.keys(nets)) {
+      for (const net of nets[name] || []) {
+        if (net.family === 'IPv4' && !net.internal) {
+          if (/^(10\.|172\.(1[6-9]|2\d|3[0-1])\.|192\.168\.)/.test(net.address)) {
+            return net.address;
+          }
+        }
+      }
+    }
+  } catch {}
+  return undefined;
+}
+
+const LAN_HOST = process.env.DEV_HOST || getLanIP();
+
 // Middleware
+// Allow localhost and LAN dev host for mobile testing
+const allowedOrigins = new Set([
+  'http://localhost:3000',
+  LAN_HOST ? `http://${LAN_HOST}:3000` : null
+].filter(Boolean));
+
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+  origin: (origin, cb) => {
+    if (!origin) return cb(null, true); // direct curl / mobile address bar
+    return cb(null, allowedOrigins.has(origin));
+  },
   credentials: true
 }));
 app.use(express.json({ limit: '50mb' }));
@@ -91,7 +119,7 @@ app.use((req, res) => {
 // Start server
 app.listen(PORT, '0.0.0.0', () => {
   logger.info(`🚀 ScottBot Local server running on http://localhost:${PORT}`);
-  logger.info(`📱 Accessible on LAN at http://<your-ip>:${PORT}`);
+  logger.info(`📱 Accessible on LAN at http://${LAN_HOST || '<your-ip>'}:${PORT}`);
 });
 
 // Graceful shutdown
